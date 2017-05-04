@@ -2,25 +2,11 @@
 #define HELIUM_ATOM_H
 
 #include <SoftwareSerial.h>
-#include "carbon.h"
+#include <carbon.h>
 
-#define ATOM_MAX_FRAME_SIZE CARBON_TX_MAX_SIZE
+#define ATOM_MAX_DATA_SIZE CARBON_MAX_DATA_SIZE
 
 namespace helium {
-
-    class AtomFrame {
-    public:
-        AtomFrame();
-        size_t append(void const *data, size_t len);
-        void sequence_set(uint8_t sequence);
-        void reset();
-
-        uint8_t used;
-        uint8_t sequence;
-        uint8_t frame[ATOM_MAX_FRAME_SIZE];
-
-
-    };
 
     class Atom {
     public:
@@ -30,34 +16,19 @@ namespace helium {
          * @param serial Serial port to connect to
          * @param power Pin to turn control power to the atom
          */
-        Atom(int tx, int rx, int power_pin);
+        Atom(int tx, int rx);
 
-        void enable();
-        void disable();
-
-        enum carbon_connect_status connect();
         bool is_connected();
-        enum carbon_sleep_status sleep();
+        enum carbon_connect_status connect(struct connection *connection);
+        enum carbon_sleep_status sleep(struct connection *connection);
 
-        enum carbon_send_data_status send(AtomFrame &frame);
-
-        virtual ~Atom() {
-            disable();
-        }
+        enum carbon_send_status send(void const *data, size_t len);
 
     private:
+        struct carbon_ctx ctx;
         SoftwareSerial serial;
-        int power;
-
-        uint8_t sequence;
-        struct carbon_ctx carbon_ctx;
-        struct carbon_transport_iface carbon_iface;
-        static void transport_init(void *param);
-        static void transport_enable(void *param);
-        static void transport_disable(void *param);
-        static enum carbon_iface_tx_stat transport_tx(void * param, struct carbon_tx_buffer const * buffer);
-        static enum carbon_iface_rx_stat transport_rx(void * param, struct carbon_rx_buffer * buffer);
     };
+
 }
 
 #endif
