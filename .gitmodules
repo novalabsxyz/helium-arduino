@@ -1,3 +1,0 @@
-[submodule "lib/carbon"]
-	path = lib/carbon
-	url = git@github.com:helium/carbon.git

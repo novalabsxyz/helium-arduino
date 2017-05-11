@@ -1,40 +1,50 @@
-#include <Arduino.h>
-// #include "carbon.h"
 #include "helium.h"
+#include "Arduino.h"
+#include "carbon/carbon.h"
 
-namespace helium {
-
-    Atom::Atom(int tx, int rx) : serial(rx, tx) {
-        serial.begin(115200);
-    }
-
-    enum carbon_connect_status Atom::connect(struct connection *connection) {
-        return carbon_connect(&ctx, connection);
-    }
-
-    bool Atom::is_connected() {
-        return carbon_connected(&ctx) == carbon_connected_CONNECTED;
-    }
-
-    enum carbon_sleep_status Atom::sleep(struct connection *connection) {
-        return carbon_sleep(&ctx, connection);
-    }
-
-
-    enum carbon_send_status Atom::send(void const *data, size_t len) {
-        return carbon_send(&ctx, data, len);
-    }
-
+bool carbon_serial_readable(void *param) {
+    Stream *serial = (Stream *)param;
+    return serial->available() > 0;
 }
 
-size_t carbon_read(void *param, void *buf, size_t len) {
-    return 0;
+bool carbon_serial_getc(void *param, uint8_t *ch) {
+    Stream *serial = (Stream *)param;
+    *ch = serial->read();
+    return *ch != -1;
 }
 
-size_t carbon_write(void *param, void *buf, size_t len) {
-    return 0;
+bool carbon_serial_putc(void *param, uint8_t ch) {
+    Stream *serial = (Stream *)param;
+    return serial->write(ch) == 1;
 }
 
-void carbon_wait_ms(uint32_t ms) {
-    return;
+void carbon_wait_ms(void *param, uint32_t ms) {
+    (void)param;
+    delay(ms);
+}
+
+
+Helium::Helium(Stream *stream) {
+    carbon_init(&_ctx, (void *)stream);
+}
+
+enum carbon_connect_status Helium::connect() {
+    return carbon_connect(&_ctx, NULL);
+}
+
+enum carbon_info_status Helium::info(struct res_info *info) {
+    return carbon_info(&_ctx, info);
+}
+
+bool Helium::is_connected() {
+    return carbon_connected(&_ctx) == carbon_connected_CONNECTED;
+}
+
+enum carbon_sleep_status Helium::sleep() {
+    return carbon_sleep(&_ctx, NULL);
+}
+
+
+enum carbon_send_status Helium::send(void const *data, size_t len) {
+    return carbon_send(&_ctx, data, len);
 }
