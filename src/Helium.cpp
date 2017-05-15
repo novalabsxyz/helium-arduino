@@ -18,7 +18,7 @@ bool carbon_serial_putc(void *param, uint8_t ch) {
     return serial->write(ch) == 1;
 }
 
-void carbon_wait_ms(void *param, uint32_t ms) {
+void carbon_wait_us(void *param, uint32_t ms) {
     (void)param;
     delay(ms);
 }
@@ -36,7 +36,7 @@ enum carbon_info_status Helium::info(struct res_info *info) {
     return carbon_info(&_ctx, info);
 }
 
-bool Helium::is_connected() {
+bool Helium::connected() {
     return carbon_connected(&_ctx) == carbon_connected_CONNECTED;
 }
 

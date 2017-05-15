@@ -16,7 +16,7 @@ public:
      */
     Helium(Stream *serial);
 
-    bool is_connected();
+    bool connected();
     enum carbon_connect_status connect();
     enum carbon_sleep_status sleep();
     enum carbon_info_status info(struct res_info *info);
