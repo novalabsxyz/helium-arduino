@@ -6,25 +6,40 @@
 
 #define HELIUM_BAUD_RATE 115200
 
-class Helium {
-public:
-    /** Create an Atom connected to the specified Serial port. The
-     * power pin is used to turn the power to the Atom on or off.
+class Channel;
+
+class Helium
+{
+  public:
+    /** Create an Atom connected to the specified Serial port.
      *
      * @param serial Serial port to connect to
-     * @param power Pin to turn control power to the atom
      */
-    Helium(Stream *serial);
+    Helium(Stream * serial);
 
     bool connected();
-    enum carbon_connect_status connect();
-    enum carbon_sleep_status sleep();
-    enum carbon_info_status info(struct res_info *info);
+    int  connect();
+    int  sleep();
+    int info(struct res_info * info);
 
-    enum carbon_send_status send(void const *data, size_t len);
-
-private:
+    // int send(void const *data, size_t len);
+  private:
     struct carbon_ctx _ctx;
+
+    friend class Channel;
+};
+
+class Channel
+{
+  public:
+    Channel(Helium * helium);
+
+    int begin(const char *name);
+    int send(void const * data, size_t len);
+
+  private:
+    Helium *_helium;
+    uint8_t _id;
 };
 
 #endif
