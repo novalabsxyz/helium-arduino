@@ -1,30 +1,41 @@
-#ifndef HELIUM_ATOM_H
-#define HELIUM_ATOM_H
+#ifndef HELIUM_H
+#define HELIUM_H
 
 #include "Arduino.h"
-#include "carbon/carbon.h"
+#include "helium-client/helium-client.h"
 
-#define HELIUM_BAUD_RATE 115200
-
-class Channel;
+#if defined(ARDUINO_AVR_UNO)
+#include <SoftwareSerial.h>
+#endif
 
 class Helium
 {
   public:
-    /** Create an Atom connected to the specified Serial port.
-     *
-     * @param serial Serial port to connect to
-     */
-    Helium(Stream * serial);
+    Helium(HardwareSerial * serial);
+
+#if defined(ARDUINO_AVR_UNO)
+    Helium(SoftwareSerial * serial);
+#endif
+
+    int begin(enum helium_baud baud);
+    int info(struct helium_info * info);
+
+    int connect(struct connection * connection, uint32_t retries);
+    int connect()
+    {
+        return connect(NULL, HELIUM_POLL_RETRIES_5S);
+    }
 
     bool connected();
-    int  connect();
-    int  sleep();
-    int info(struct res_info * info);
+    int sleep(struct connection * connection);
+    int  sleep()
+    {
+        return sleep(NULL);
+    }
+    int poll(void * data, const size_t len, size_t used, uint32_t retries);
 
-    // int send(void const *data, size_t len);
   private:
-    struct carbon_ctx _ctx;
+    struct helium_ctx _ctx;
 
     friend class Channel;
 };
@@ -34,12 +45,16 @@ class Channel
   public:
     Channel(Helium * helium);
 
-    int begin(const char *name);
-    int send(void const * data, size_t len);
+    int begin(const char * name);
+    int send(void const * data, size_t len, int8_t * result);
+
+    int begin(const char * name, uint16_t * token);
+    int send(void const * data, size_t len, uint16_t * token);
+    int poll(uint16_t token, int8_t * result, uint32_t retries);
 
   private:
-    Helium *_helium;
-    uint8_t _id;
+    Helium * _helium;
+    int8_t   _channel_id;
 };
 
-#endif
+#endif // HELIUM_H

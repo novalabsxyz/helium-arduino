@@ -1,63 +1,120 @@
-#include "Helium.h"
 #include "Arduino.h"
+#include "helium-client/helium-client.h"
+#include "Helium.h"
 
 bool
-carbon_serial_readable(void * param)
+helium_serial_readable(void * param)
 {
-    Stream * serial = (Stream *)param;
-    return serial->available() > 0;
+    Stream * stream = (Stream *)param;
+    return stream->available() > 0;
 }
 
 bool
-carbon_serial_getc(void * param, uint8_t * ch)
+helium_serial_getc(void * param, uint8_t * ch)
 {
-    Stream * serial = (Stream *)param;
-    *ch             = serial->read();
+    Stream * stream = (Stream *)param;
+    *ch             = stream->read();
     return *ch != -1;
 }
 
 bool
-carbon_serial_putc(void * param, uint8_t ch)
+helium_serial_putc(void * param, uint8_t ch)
 {
-    Stream * serial = (Stream *)param;
-    return serial->write(ch) == 1;
+    Stream * stream = (Stream *)param;
+    return stream->write(ch) == 1;
 }
 
 void
-carbon_wait_us(void * param, uint32_t us)
+helium_wait_us(void * param, uint32_t us)
 {
     (void)param;
+
+#if defined(ARDUINO_ARCH_AVR)
+#define MAX_DELAY_US 16384
+    while (us > MAX_DELAY_US)
+    {
+        delayMicroseconds(MAX_DELAY_US);
+        us -= MAX_DELAY_US;
+    }
     delayMicroseconds(us);
+#else
+    delayMicroseconds(us);
+#endif
 }
 
-
-Helium::Helium(Stream * stream)
+Helium::Helium(HardwareSerial * serial)
 {
-    carbon_init(&_ctx, (void *)stream);
+    helium_init(&_ctx, (void *)serial);
+}
+
+#if defined(ARDUINO_AVR_UNO)
+Helium::Helium(SoftwareSerial * serial)
+{
+    helium_init(&_ctx, (void *)serial);
+}
+#endif
+
+int
+Helium::begin(enum helium_baud baud)
+{
+#if defined(ARDUINO_AVR_UNO)
+    SoftwareSerial * serial = (SoftwareSerial *)_ctx.param;
+#else
+    HardwareSerial * serial = (HardwareSerial *)_ctx.param;
+#endif
+    serial->begin(9600);
+
+    int result = helium_baud(&_ctx, baud);
+
+    uint32_t serial_baud = 9600;
+    switch (baud)
+    {
+    case helium_baud_b9600:
+        serial_baud = 9600;
+        break;
+    case helium_baud_b14400:
+        serial_baud = 14400;
+        break;
+    case helium_baud_b19200:
+        serial_baud = 19200;
+        break;
+    case helium_baud_b38400:
+        serial_baud = 38400;
+        break;
+    case helium_baud_b57600:
+        serial_baud = 57600;
+        break;
+    case helium_baud_b115200:
+        serial_baud = 115200;
+        break;
+    }
+    serial->begin(serial_baud);
+    return result;
 }
 
 int
-Helium::connect()
+Helium::info(struct helium_info * info)
 {
-    return carbon_connect(&_ctx, NULL);
+    return helium_info(&_ctx, info);
 }
 
 int
-Helium::info(struct res_info * info)
+Helium::connect(struct connection * connection, uint32_t retries)
 {
-    return carbon_info(&_ctx, info);
+    return helium_connect(&_ctx, connection, retries);
 }
+
 
 bool
 Helium::connected()
 {
-    return carbon_connected(&_ctx) == carbon_status_OK;
+    return helium_connected(&_ctx) == helium_connected_CONNECTED;
 }
 
 int
-Helium::sleep()
+Helium::sleep(struct connection * connection)
 {
-    return carbon_sleep(&_ctx, NULL);
+    return helium_sleep(&_ctx, connection);
 }
 
 //
@@ -70,23 +127,43 @@ Channel::Channel(Helium * helium)
 }
 
 int
-Channel::begin(const char * name)
+Channel::begin(const char * name, uint16_t * token)
 {
-    return carbon_channel_create(&_helium->_ctx, name, strlen(name), &_id);
+    return helium_channel_create(&_helium->_ctx, name, strlen(name), token);
 }
 
 int
-Channel::send(void const * data, size_t len)
+Channel::begin(const char * name)
 {
-    uint8_t result;
-    int     send_result =
-        carbon_channel_send(&_helium->_ctx, _id, data, len, &result);
-    if (send_result == carbon_status_OK)
+    uint16_t token;
+    int      status = begin(name, &token);
+    if (helium_status_OK == status)
     {
-        return result;
+        status = poll(token, &_channel_id, HELIUM_POLL_RETRIES_5S);
     }
-    else
+    return status;
+}
+
+int
+Channel::send(void const * data, size_t len, uint16_t * token)
+{
+    return helium_channel_send(&_helium->_ctx, _channel_id, data, len, token);
+}
+
+
+int
+Channel::send(void const * data, size_t len, int8_t * result)
+{
+    uint16_t token;
+    int      status = send(data, len, &token);
+    if (helium_status_OK == status)
     {
-        return -1;
+        status = poll(token, result, HELIUM_POLL_RETRIES_5S);
     }
+    return status;
+}
+
+int Channel::poll(uint16_t token, int8_t * result, uint32_t retries)
+{
+    return helium_channel_poll(&_helium->_ctx, token, result, retries);
 }
