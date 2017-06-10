@@ -10,7 +10,7 @@ install:
 env:
   - BOARD=uno
   - BOARD=mzeropro
-  - BOARD=due
+  - BOARD=zero
 
 script:
   - set -eo pipefail;
