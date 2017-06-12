@@ -16,7 +16,7 @@ script:
   - make ci
 
 before_deploy:
-  RELEASE_DIR=$(TRAVIS_BUILDIR) GIT_VERSION=$(TRAVIS_TAG) make release
+  RELEASE_DIR=$(TRAVIS_BUILD_DIR) GIT_VERSION=$(TRAVIS_TAG) make release
 
 deploy:
   provider: releases
