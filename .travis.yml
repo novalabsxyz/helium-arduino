@@ -16,8 +16,10 @@ script:
   - make ci
 
 before_deploy:
-  - RELEASE_DIR=$TRAVIS_BUILD_DIR RELEASE_VERSION=$TRAVIS_TAG make release
-  - export RELEASE_ZIP=Helium.zip
+  - export RELEASE_VERSION=$TRAVIS_TAG
+  - export RELEASE_ZIP=Helium-$RELEASE_VERSION.zip
+  - export RELEASE_DIR=$TRAVIS_BUILD_DIR
+  - make release
 
 deploy:
   - provider: releases

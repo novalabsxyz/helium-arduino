@@ -21,14 +21,14 @@ ci:
 	done
 
 .PHONY: version
-version: dirty
+version: # dirty
 ifeq ($(VERSION),)
 	$(error VERSION is not set)
 endif
-	sed -i'' 's/<version>/${VERSION}/g' library.properties
-	echo git commit -am "Library Version: ${VERSION}"
-	echo git tag -as "Version ${VERSION}" ${VERSION}
-	echo git push --tags
+	sed -i '' 's/version=.*/version=${VERSION}/' library.properties
+	git commit -am "Making library version: ${VERSION}"
+	git tag -as "Version ${VERSION}" ${VERSION}
+	git push --tags
 
 .PHONY: release
 release:
