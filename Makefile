@@ -16,6 +16,6 @@ release:
 	rm -rf ${RELEASE_DIR}/Helium
 	mkdir ${RELEASE_DIR}/Helium
 	cp -R src examples ${RELEASE_DIR}/Helium
-	find Helium -type d -name ".*" -and -not -name '.' -print0 | xargs -0 rm -rf
+	find ${RELEASE_DIR}/Helium -type d -name ".*" -and -not -name '.' -print0 | xargs -0 rm -rf
 	sed 's/<version>/${GIT_VERSION}/g' library.properties > ${RELEASE_DIR}/Helium/library.properties
 	cd ${RELEASE_DIR}; zip -urq ${RELEASE_ZIP} Helium
