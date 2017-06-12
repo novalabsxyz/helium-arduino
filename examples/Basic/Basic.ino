@@ -1,3 +1,8 @@
+/*
+ * Copyright 2017, Helium Systems, Inc.
+ * All Rights Reserved. See LICENCE.txt for license information
+ */
+
 #include "Arduino.h"
 #include "Board.h"
 #include "Helium.h"
