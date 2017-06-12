@@ -1,8 +1,12 @@
 PROJECT=helium-arduino
-RELEASE_VERSION ?= $(shell git describe --abbrev=4 --dirty --always --tags)
 RELEASE_DIR ?= .
 RELEASE_ZIP ?= Helium.zip
 BOARD ?= uno
+ifeq ($(strip $(shell git status --porcelain 2>/dev/null)),)
+	GIT_TREE_STATE=clean
+else
+	GIT_TREE_STATE=dirty
+endif
 
 all: ci
 
@@ -16,15 +20,30 @@ ci:
 	  platformio ci --board=${BOARD} --lib=src $$e/*; \
 	done
 
+.PHONY: version
+version: dirty
+ifeq ($(VERSION),)
+	$(error VERSION is not set)
+endif
+	sed -i'' 's/<version>/${VERSION}/g' library.properties
+	echo git commit -am "Library Version: ${VERSION}"
+	echo git tag -as "Version ${VERSION}" ${VERSION}
+	echo git push --tags
+
 .PHONY: release
 release:
 	rm -rf ${RELEASE_DIR}/Helium
 	mkdir ${RELEASE_DIR}/Helium
 	cp -R src examples ${RELEASE_DIR}/Helium
 	find ${RELEASE_DIR}/Helium -type d -name ".*" -and -not -name '.' -print0 | xargs -0 rm -rf
-	sed 's/<version>/${RELEASE_VERSION}/g' library.properties > ${RELEASE_DIR}/Helium/library.properties
 	cd ${RELEASE_DIR}; zip -urq ${RELEASE_ZIP} Helium
 
 .PHONY: clean
 clean:
 	rm -rf docs ${RELEASE_DIR}/Helium ${RELEASE_DIR}/${RELEASE_ZIP}
+
+.PHONE: dirty
+dirty:
+ifeq ($(GIT_TREE_STATE),dirty)
+	$(error git state is not clean)
+endif
