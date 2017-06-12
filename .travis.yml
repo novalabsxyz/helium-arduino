@@ -13,7 +13,18 @@ env:
   - BOARD=zero
 
 script:
-  - set -eo pipefail;
-    for e in examples/*; do
-      platformio ci --board=$BOARD --lib=src $e/*;
-    done
+  - make ci
+
+before_deploy:
+  RELEASE_DIR=$(TRAVIS_BUILDIR) GIT_VERSION=$(TRAVIS_TAG) make release
+
+deploy:
+  provider: releases
+  skip_cleanup: true
+  file_glob: true
+  api_key:
+    secure: l5EuM3w6prgaH0Upzn17wUL6gJfPog7cZJACJieXuSt2fa7D4uxB0/3R7cHIaUF6oXi9zkDMXJ9KmAYeP9F86GVhuXOy4TBDMfRwnKUhoMtxaHXKTbETVPEQckcUQM2cl3dAYY/E8VN4v/8UiZnUjgz2vI4aAP6grs45UkOcrAN9BNdifeG6QKqnPl2h6X97ezdUnnqmKU+keKAhPwlMdfb4RQ06Fq5RH4ObrRUidDLKwZogyyjbAU78RdtIkgwUEc2+DYp2/iYp04HaFBEune8g+GdysYgrTP6B4EntxCi7x6H39PrkEuQ+eVnEYMnrOHR/4uDUOsux4Vwhaav7F4xNHwycU2TwX6D32QhJeepd7YjXze0sKXtrYLCbCIJonRWWU2/vEfXdPfm9Is91tr4omKIsyE1t05nAdk/xJdeUAb8OeT2iSxc0ozvOjVYjcaVqUjGY+C7zLIGVi8JmDUP4LR8t8xzjXeLAx2MKkZHDSdCQh0MXOFu7EL1Gu/opsdn6N28Mv+i7ulKfLYpSs11mZAXoA9hd1weOd+AYA7FvNSXhkDXBo+FLT6/NcaykGKkoiBk3Qz6xlxNdeDR/g7UDCErvXZvGFIZ3nEdiQT3bIU9rnq25g25kO9+skJ2nRY4hNFjyKRkv38bu//V5ORWb8bd/+w+zk/IMxVHzQ5o=
+  file: helium-arduino-*.zip
+  on:
+    repo: helium/helium-arduino
+    tags: true
