@@ -28,3 +28,4 @@ deploy:
   on:
     repo: helium/helium-arduino
     tags: true
+    condition: $BOARD = uno
