@@ -1,6 +1,7 @@
 PROJECT=helium-arduino
 GIT_VERSION ?= $(shell git describe --abbrev=4 --dirty --always --tags)
 RELEASE_DIR ?= .
+RELEASE_PACKAGE ?= ${PROJECT}-${GIT_VERSION}
 BOARD ?= uno
 
 all: ci
@@ -16,4 +17,4 @@ release:
 	cp -R src examples ${RELEASE_DIR}/Helium
 	find Helium -type d -name ".*" -and -not -name '.' -print0 | xargs -0 rm -rf
 	sed 's/<version>/${GIT_VERSION}/g' library.properties > ${RELEASE_DIR}/Helium/library.properties
-	zip -urq ${PROJECT}-${GIT_VERSION}.zip ${RELEASE_DIR}/Helium
+	zip -urq ${RELEASE_PACKAGE}.zip ${RELEASE_DIR}/Helium
