@@ -27,7 +27,7 @@ ifeq ($(VERSION),)
 endif
 	sed -i '' 's/version=.*/version=${VERSION}/' library.properties
 	git commit -am "Making library version: ${VERSION}"
-	git tag -as "Version ${VERSION}" ${VERSION}
+	git tag -as -m "Version ${VERSION}" ${VERSION}
 	git push --tags
 
 .PHONY: release
