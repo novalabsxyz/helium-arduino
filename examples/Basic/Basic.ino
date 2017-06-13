@@ -36,8 +36,8 @@ setup()
     // Begin communicating with the channel. This should only need to
     // be done once.
     //
-    // NOTE: Please ensure you've created a channel called mqtt in the
-    // Helium Dashboard.
+    // NOTE: Please ensure you've created a channel called "Helium
+    // Cloud MQTT" called in the Helium Dashboard.
     int8_t result;
     Serial.print("Creating Channel - ");
     status = channel.begin("Helium Cloud MQTT", &result);
