@@ -1,11 +1,11 @@
-# %Helium for Arduino #
+# Helium for Arduino #
 
 [![Build Status](https://travis-ci.com/helium/helium-arduino.svg?token=aKFDFjxw98usjj6jrpst&branch=master)](https://travis-ci.com/helium/helium-arduino)
 
 This code repository exposes an [Arduino](https://www.arduino.cc/)
 library for
 the [Helium Atom](https://www.helium.com/products/atom-xbee-module)
-module. The %Helium Atom makes it easy to securely connect IoT devices
+module. The Helium Atom makes it easy to securely connect IoT devices
 and applications to back-end IoT services.
 
 
@@ -14,12 +14,12 @@ and applications to back-end IoT services.
 
 ## Hardware ##
 
-To get started with %Helium for Arduino you will need the following hardware:
+To get started with Helium for Arduino you will need the following hardware:
 
-* A %Helium Atom. The easiest way to get started is to get
+* A Helium Atom. The easiest way to get started is to get
   the
   [Helium Starter Kit](https://www.helium.com/products/helium-starter-kit) which
-  includes a gateway (Element), and an XBee version of the %Helium
+  includes a gateway (Element), and an XBee version of the Helium
   Atom.
 
 * An Arduino board of any supported type, such as
@@ -44,7 +44,7 @@ You will need the following software installed:
   can install this library through either of the following steps:
 
     * The Library Manager by clicking on _Sketch > Include Library_,
-      searching for %Helium and clicking the _Install_ button.
+      searching for Helium and clicking the _Install_ button.
 
     * By downloading a release _Helium.zip_ file from
       the
@@ -57,16 +57,16 @@ You will need the following software installed:
 
 ## Board Setup ##
 
-Ensure that the %Helium Element is powered on and
+Ensure that the Helium Element is powered on and
 connected. The main LED on the Element should be green or blue to
 indicate it is powered on and connected to the network.
 
-Plug the Adapter into the Arduino board and the %Helium XBee Atom into
+Plug the Adapter into the Arduino board and the Helium XBee Atom into
 the Adapter.
 
 Depending on the Arduino board you will have to configure the
 D<SUB>in</SUB> and D<SUB>out</SUB> jumpers on the Adapter to get the
-Arduino to talk to the %Helium Atom using the right pins.
+Arduino to talk to the Helium Atom using the right pins.
 
 The following boards D<SUB>in</SUB> and D<SUB>out</SUB> pins are
 known. Other setups will also work but we've confirmed the following
@@ -90,23 +90,23 @@ see the Atom power on, connect and perform the task coded into the
 loaded example sketch.
 
 Note that some of the demo sketches will require you to have a
-configured %Channel in the %Helium Dashboard in order to channel data
+configured Channel in the Helium Dashboard in order to channel data
 from the device all the way to the end IoT service.
 
-Please read the comments in the example sketch and in the %Channel
+Please read the comments in the example sketch and in the Channel
 configuration sections in the dashboard for more information on how to
 set up and configure channels.
 
 ## Getting Help ##
 
-That should be all you need to get going with %Helium and Arduino. The
+That should be all you need to get going with Helium and Arduino. The
 Arduino community has a vast library of supported hardware extensions,
 all with libraries and example sketches to show their use. Tying these
-together with the %Helium wireless network will make it a breeze to
+together with the Helium wireless network will make it a breeze to
 build a connected IoT device.
 
 If you have any questions or ideas about how to use this code - or any
-part of %Helium - head over to
+part of Helium - head over to
 the [Helium Community Slack](http://chat.helium.com/). We're standing
 by to help.
 
