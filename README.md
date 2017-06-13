@@ -1,6 +1,6 @@
 # Helium for Arduino #
 
-[![Build Status](https://travis-ci.com/helium/helium-arduino.svg?token=aKFDFjxw98usjj6jrpst&branch=master)](https://travis-ci.com/helium/helium-arduino)
+[![Build Status](https://travis-ci.org/helium/helium-arduino.svg?branch=master)](https://travis-ci.org/helium/helium-arduino)
 
 This code repository exposes an [Arduino](https://www.arduino.cc/)
 library for
