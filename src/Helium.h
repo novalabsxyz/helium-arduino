@@ -166,9 +166,13 @@ class Channel
      * registered with the channel with the given name as configured
      * in the Helium Dashboard.
      *
+     * The `result` value will be 0 if the channel was created
+     * successfully and non-`0` otherwise.
+     *
      * @param name The name of the channel to authenticate with.
+     * @param result An out parameter for the result of the request.
      */
-    int begin(const char * name);
+    int begin(const char * name, int8_t * result);
 
     /** Send data to this channel.
      *

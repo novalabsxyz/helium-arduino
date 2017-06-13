@@ -3,9 +3,9 @@
  * All Rights Reserved. See LICENCE.txt for license information
  */
 
+#include "Helium.h"
 #include "Arduino.h"
 #include "helium-client/helium-client.h"
-#include "Helium.h"
 
 bool
 helium_serial_readable(void * param)
@@ -138,14 +138,23 @@ Channel::begin(const char * name, uint16_t * token)
 }
 
 int
-Channel::begin(const char * name)
+Channel::begin(const char * name, int8_t * result)
 {
     uint16_t token;
     int      status = begin(name, &token);
+    _channel_id     = -1;
     if (helium_status_OK == status)
     {
         status = poll(token, &_channel_id, HELIUM_POLL_RETRIES_5S);
     }
+
+    // Serial.println(_channel_id);
+    if (result)
+    {
+        *result =
+            status == helium_status_OK && _channel_id > 0 ? 0 : _channel_id;
+    }
+
     return status;
 }
 
@@ -168,7 +177,8 @@ Channel::send(void const * data, size_t len, int8_t * result)
     return status;
 }
 
-int Channel::poll(uint16_t token, int8_t * result, uint32_t retries)
+int
+Channel::poll(uint16_t token, int8_t * result, uint32_t retries)
 {
     return helium_channel_poll(&_helium->_ctx, token, result, retries);
 }
