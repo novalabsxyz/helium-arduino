@@ -39,12 +39,11 @@ release:
 
 .PHONY: gh-pages
 gh-pages: docs
-	git fetch origin gh-pages
 	rm -rf gh-pages
 	git worktree prune
-	git worktree add gh-pages -B gh-pages --checkout
-	cd gh-pages; git pull origin gh-pages
+	git worktree add gh-pages -B gh-pages origin/gh-pages
 	rm -rf gh-pages/*
+	touch gh-pages/.nojekyll
 	mv docs/html/* gh-pages
 	cd gh-pages; git add .; git commit -m "Generate docs"; git push origin gh-pages
 	rm -rf gh-pages
