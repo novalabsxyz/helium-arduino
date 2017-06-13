@@ -57,9 +57,9 @@ clean:
 
 .PHONY: check_version
 check_version:
-	ifeq ($(VERSION),)
-		$(error VERSION is not set)
-	endif
+ifeq ($(VERSION),)
+	$(error VERSION is not set)
+endif
 
 
 .PHONY: check_dirty
