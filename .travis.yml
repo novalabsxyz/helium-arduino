@@ -21,6 +21,9 @@ before_deploy:
   - export RELEASE_DIR=$TRAVIS_BUILD_DIR
   - make release
 
+after_deploy:
+  - make gh-pages
+
 deploy:
   - provider: releases
     skip_cleanup: true
