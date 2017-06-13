@@ -34,7 +34,7 @@ endif
 release:
 	rm -rf ${RELEASE_DIR}/Helium
 	mkdir ${RELEASE_DIR}/Helium
-	cp -R src examples ${RELEASE_DIR}/Helium
+	cp -R library.properties src examples ${RELEASE_DIR}/Helium
 	find ${RELEASE_DIR}/Helium -type d -name ".*" -and -not -name '.' -print0 | xargs -0 rm -rf
 	cd ${RELEASE_DIR}; zip -urq ${RELEASE_ZIP} Helium
 
