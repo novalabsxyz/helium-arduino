@@ -1,0 +1,43 @@
+#######################################
+# Syntax Coloring Map For Helium
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+Helium	KEYWORD1
+Channel	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+info	KEYWORD2
+connect	KEYWORD2
+connected	KEYWORD2
+sleep	KEYWORD2
+send	KEYWORD2
+poll	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+helium_baud_b9600	LITERAL1
+helium_baud_b14400	LITERAL1
+helium_baud_b19200	LITERAL1
+helium_baud_b38400	LITERAL1
+helium_baud_b57600	LITERAL1
+helium_baud_b115200	LITERAL1
+
+helium_status_OK	LITERAL1
+helium_status_OK	LITERAL1
+helium_status_OK_NO_DATA	LITERAL1
+helium_status_ERR_COMMUNICATION	LITERAL1
+helium_status_ERR_NOT_CONNECTED	LITERAL1
+helium_status_ERR_TIMEOUT	LITERAL1
+helium_status_ERR_DROPPED	LITERAL1
+helium_status_ERR_KEEP_AWAKE	LITERAL1
+helium_status_ERR_NOT_FOUND	LITERAL1
