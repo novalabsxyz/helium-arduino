@@ -11,6 +11,7 @@ env:
   - BOARD=uno
   - BOARD=mzeropro
   - BOARD=zero
+  - BOARD=due
 
 script:
   - make ci

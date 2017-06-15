@@ -72,11 +72,13 @@ The following boards D<SUB>in</SUB> and D<SUB>out</SUB> pins are
 known. Other setups will also work but we've confirmed the following
 work.
 
-Board             | D<SUB>in</SUB> | D<SUB>out</SUB>
-------------------| -------------: | --------------:
-Arduino Uno       | 8              | 9
-Arduino M0 Pro    | 0              | 1
-Arduino Zero      | 0              | 1
+Board             | D<SUB>in</SUB> | D<SUB>out</SUB> | Notes
+------------------| -------------: | --------------: | -----
+Arduino Uno       | 9              | 8               |
+Arduino M0 Pro    | 0              | 1               |
+Arduino Zero      | 0              | 1               |
+Arduino Due       | 9              | 8               | Wire up RX3 (15) to pin 8 on board, TX3 to pin9
+
 
 ## Example Setup ##
 
