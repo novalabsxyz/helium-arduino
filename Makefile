@@ -25,7 +25,7 @@ version: check_dirty check_version
 	sed -i '' 's/version=.*/version=${VERSION}/' library.properties
 	git commit -am "Making library version: ${VERSION}"
 	git tag -as -m "Version ${VERSION}" ${VERSION}
-	git push --tags origin master
+	git push origin master --tags
 
 
 .PHONY: release
