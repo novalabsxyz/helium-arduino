@@ -19,7 +19,7 @@ setup()
     // Begin communication with the Helium Atom
     // The baud rate differs per supported board
     // and is configured in Board.h
-    atom_serial.begin(9600);
+    helium.begin(HELIUM_BAUD_RATE);
 
     // Connect the Atom to the Helium Network
     Serial.print("Connecting - ");

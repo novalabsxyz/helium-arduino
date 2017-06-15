@@ -12,15 +12,15 @@
 SoftwareSerial atom_serial(8, 9);
 #define HELIUM_BAUD_RATE helium_baud_b9600
 
-#elif defined(ARDUINO_SAMD_ZERO)
+#elif defined(ARDUINO_SAM_ZERO)
 
-#ifdef Serial5
 // Arduino M0 Pro
 #define atom_serial Serial5
-#else
+
+#elif defined(ARDUINO_SAMD_ZERO)
+
 // Arduino Zero
 #define atom_serial Serial1
-#endif
 
 #endif
 
