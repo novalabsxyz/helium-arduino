@@ -21,9 +21,6 @@
             "maintainer":true
         }
     ],
-    "export": {
-        "include": "src"
-    },
     "frameworks":
     [
         "arduino"
