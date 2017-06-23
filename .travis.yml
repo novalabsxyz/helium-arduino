@@ -21,6 +21,7 @@ after_deploy:
 
 deploy:
   - provider: releases
+    skip_cleanup: true
     on:
       repo: helium/helium-arduino
       tags: true
