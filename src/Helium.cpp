@@ -148,7 +148,6 @@ Channel::begin(const char * name, int8_t * result)
         status = poll(token, &_channel_id, HELIUM_POLL_RETRIES_5S);
     }
 
-    // Serial.println(_channel_id);
     if (result)
     {
         *result =
@@ -180,5 +179,5 @@ Channel::send(void const * data, size_t len, int8_t * result)
 int
 Channel::poll(uint16_t token, int8_t * result, uint32_t retries)
 {
-    return helium_channel_poll(&_helium->_ctx, token, result, retries);
+    return helium_channel_poll_result(&_helium->_ctx, token, result, retries);
 }

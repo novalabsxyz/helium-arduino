@@ -10,6 +10,37 @@
 Helium  helium(&atom_serial);
 Channel channel(&helium);
 
+void report_status(int status)
+{
+    if (helium_status_OK == status)
+    {
+        Serial.println("Succeeded");
+    }
+    else
+    {
+        Serial.println("Failed");
+    }
+}
+
+void report_status_result(int status, int result)
+{
+    if (helium_status_OK == status)
+    {
+        if (result == 0)
+        {
+            Serial.println("Succeeded");
+        }
+        else {
+            Serial.print("Failed - ");
+            Serial.println(result);
+        }
+    }
+    else
+    {
+        Serial.println("Failed");
+    }
+}
+
 void
 setup()
 {
@@ -24,14 +55,8 @@ setup()
     // Connect the Atom to the Helium Network
     Serial.print("Connecting - ");
     int status = helium.connect();
-    if (helium_status_OK == status)
-    {
-        Serial.println("Succeeded");
-    }
-    else
-    {
-        Serial.println("Failed");
-    }
+    // Print status
+    report_status(status);
 
     // Begin communicating with the channel. This should only need to
     // be done once.
@@ -41,14 +66,8 @@ setup()
     int8_t result;
     Serial.print("Creating Channel - ");
     status = channel.begin("Helium Cloud MQTT", &result);
-    if (helium_status_OK == status && result == 0)
-    {
-        Serial.println("Succeeded");
-    }
-    else
-    {
-        Serial.println("Failed");
-    }
+    // Print status and result
+    report_status_result(status, result);
 }
 
 void
@@ -60,14 +79,9 @@ loop()
     int8_t result;
     Serial.print("Sending - ");
     int    status = channel.send(data, strlen(data), &result);
-    if (helium_status_OK == status && result == 0)
-    {
-        Serial.println("Succeeded");
-    }
-    else
-    {
-        Serial.println("Failed");
-    }
+    // Print status and result
+    report_status_result(status, result);
 
+    // Wait a while till the next time
     delay(5000);
 }
