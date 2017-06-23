@@ -15,7 +15,7 @@ docs:
 .PHONY: clean
 ci:
 	for e in examples/*; do \
-	  platformio ci --board=${BOARD} --lib=src $$e/*; \
+	  platformio ci --board=${BOARD} --lib=. $$e/*; \
 	done
 
 .PHONY: version
