@@ -16,11 +16,11 @@ env:
 script:
   - make ci
 
+after_deploy:
+  - make gh-pages
+
 deploy:
-  - provider: script
-    skip_cleanup: true
-    script:
-      - make gh-pages
+  - provider: releases
     on:
       repo: helium/helium-arduino
       tags: true
