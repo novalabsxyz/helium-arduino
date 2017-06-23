@@ -1,6 +1,4 @@
 PROJECT=helium-arduino
-RELEASE_DIR ?= .
-RELEASE_ZIP ?= Helium.zip
 BOARD ?= uno
 ifeq ($(strip $(shell git status --porcelain 2>/dev/null)),)
 	GIT_TREE_STATE=clean
@@ -28,13 +26,9 @@ version: check_dirty check_version
 	git push origin master --tags
 
 
-.PHONY: release
-release:
-	rm -rf ${RELEASE_DIR}/Helium
-	mkdir ${RELEASE_DIR}/Helium
-	cp -R library.properties src examples ${RELEASE_DIR}/Helium
-	find ${RELEASE_DIR}/Helium -type d -name ".*" -and -not -name '.' -print0 | xargs -0 rm -rf
-	cd ${RELEASE_DIR}; zip -urq ${RELEASE_ZIP} Helium
+.PHONY: update
+update: check_helium_client
+	rsync -r --del --exclude='.git' --exclude='.gitignore' --exclude='.travis.yml' ${HELIUM_CLIENT_DIR} src/
 
 
 .PHONY: gh-pages
@@ -52,7 +46,14 @@ gh-pages: docs
 
 .PHONY: clean
 clean:
-	rm -rf docs ${RELEASE_DIR}/Helium ${RELEASE_DIR}/${RELEASE_ZIP}
+	rm -rf docs
+
+
+.PHONY: check_helium_client
+check_helium_client:
+ifeq ($(HELIUM_CLIENT_DIR),)
+	$(error HELIUM_CLIENT_DIR is not set)
+endif
 
 
 .PHONY: check_version
