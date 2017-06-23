@@ -21,6 +21,7 @@ ci:
 .PHONY: version
 version: check_dirty check_version
 	sed -i '' 's/version=.*/version=${VERSION}/' library.properties
+	sed -i '' "s/\"version\":.*/\"version\": \"${VERSION}\",/"  library.json
 	git commit -am "Making library version: ${VERSION}"
 	git tag -as -m "Version ${VERSION}" ${VERSION}
 	git push origin master --tags

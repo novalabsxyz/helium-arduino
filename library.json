@@ -1,0 +1,32 @@
+{
+    "name": "Helium",
+    "keywords": [
+        "helium",
+        "iot",
+        "15.4",
+        "radio"
+    ],
+    "description": "An Arduino Library for communicating with the Helium Atom",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/helium/helium-arduino.git"
+    },
+    "version": "0.1.17",
+    "authors":
+    [
+        {
+            "name": "Helium",
+            "email": "info@helium.com",
+            "url": "https://helium.com",
+            "maintainer":true
+        }
+    ],
+    "export": {
+        "include": "src"
+    },
+    "frameworks":
+    [
+        "arduino"
+    ],
+    "platforms": "*"
+}
