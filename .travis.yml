@@ -23,7 +23,7 @@ script:
   - make ci
 
 before_deploy:
-  - make gh-pages
+  - make docs
 
 deploy:
   - provider: releases
