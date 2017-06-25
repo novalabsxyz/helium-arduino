@@ -11,6 +11,7 @@ all: ci
 .PHONY: docs
 docs:
 	@doxygen Doxyfile
+	@touch docs/html/.nojekyll
 
 .PHONY: clean
 ci:
@@ -30,20 +31,6 @@ version: check_dirty check_version
 .PHONY: update
 update: check_helium_client
 	rsync -r --del --exclude='.git' --exclude='.gitignore' --exclude='.travis.yml' ${HELIUM_CLIENT_DIR} src/
-
-
-.PHONY: gh-pages
-gh-pages: docs
-	rm -rf gh-pages
-	git worktree prune
-	git worktree add gh-pages -B gh-pages origin/gh-pages
-	rm -rf gh-pages/*
-	touch gh-pages/.nojekyll
-	mv docs/html/* gh-pages
-	cd gh-pages; git add .; git commit -m "Generate docs"; git push origin gh-pages
-	rm -rf gh-pages
-	git worktree prune
-
 
 .PHONY: clean
 clean:
