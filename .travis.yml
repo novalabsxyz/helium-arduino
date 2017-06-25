@@ -7,6 +7,12 @@ cache:
 install:
   - pip install -U platformio
 
+addons:
+  apt:
+    packages:
+      - doxygen
+      - doxygen-doc
+
 env:
   - BOARD=uno
   - BOARD=mzeropro
@@ -16,7 +22,7 @@ env:
 script:
   - make ci
 
-after_deploy:
+before_deploy:
   - make gh-pages
 
 deploy:
@@ -25,4 +31,10 @@ deploy:
     on:
       repo: helium/helium-arduino
       tags: true
+      condition: $BOARD = uno
+  - provider: pages
+    skip_cleanup: true
+    local_dir: $TRAVIS_BUILD_DIR/docs/html
+    on:
+      repo: helium/helium-arduino
       condition: $BOARD = uno
