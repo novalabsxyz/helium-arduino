@@ -1,6 +1,6 @@
 # Helium for Arduino #
 
-[![Build Status](https://travis-ci.org/helium/helium-arduino.svg?branch=master)](https://travis-ci.org/helium/helium-arduino)
+![Build Status](https://travis-ci.org/helium/helium-arduino.svg?branch=master)
 
 This code repository exposes an [Arduino](https://www.arduino.cc/)
 library for
@@ -72,12 +72,12 @@ The following boards D<SUB>in</SUB> and D<SUB>out</SUB> pins are
 known. Other setups will also work but we've confirmed the following
 work.
 
-Board             | D<SUB>in</SUB> | D<SUB>out</SUB> | Notes
-------------------| -------------: | --------------: | -----
-Arduino Uno       | 9              | 8               |
-Arduino M0 Pro    | 0              | 1               |
-Arduino Zero      | 0              | 1               |
-Arduino Due       | 9              | 8               | Wire up RX3 (15) to pin 8 on board, TX3 to pin9
+Board             | D<SUB>in</SUB> | D<SUB>out</SUB> | Notes                                           |
+------------------| -------------: | --------------: | ------------------------------------------------|
+Arduino Uno       | 9              | 8               |                                                 |
+Arduino M0 Pro    | 0              | 1               |                                                 |
+Arduino Zero      | 0              | 1               |                                                 |
+Arduino Due       | 9              | 8               | Wire up RX3 (15) to pin 8 on board, TX3 to pin9 |
 
 
 ## Example Setup ##
@@ -118,5 +118,5 @@ Want to contribute to helium-arduino? That's awesome!
 
 Please
 see
-[CONTRIBUTING.md](https://github.com/helium/helium-arduino/CONTRIBUTING.md) in
+[CONTRIBUTING.md](https://github.com/helium/helium-arduino/blob/master/CONTRIBUTING.md) in
 this repository for details.
