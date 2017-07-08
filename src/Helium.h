@@ -106,18 +106,8 @@ class Helium
      *
      * @see Helium::sleep() for the easy version.
      */
-    int sleep(struct connection * connection);
+    int sleep(struct connection * connection = NULL);
 
-    /** Disconnect the Atom and put it to sleep.
-     *
-     * This is the convenience version of sleep. A subsequent connect
-     * call will go through a normal connect cycle.
-     *
-     */
-    int sleep()
-    {
-        return sleep(NULL);
-    }
 
   private:
     struct helium_ctx _ctx;

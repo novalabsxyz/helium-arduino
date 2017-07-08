@@ -145,7 +145,7 @@ Channel::begin(const char * name, int8_t * result)
     _channel_id     = -1;
     if (helium_status_OK == status)
     {
-        status = poll_result(token, &_channel_id, HELIUM_POLL_RETRIES_5S);
+        status = poll_result(token, &_channel_id);
     }
 
     if (result)
@@ -170,7 +170,7 @@ Channel::send(void const * data, size_t len, int8_t * result)
     int      status = send(data, len, &token);
     if (helium_status_OK == status)
     {
-        status = poll_result(token, result, HELIUM_POLL_RETRIES_5S);
+        status = poll_result(token, result);
     }
     return status;
 }
