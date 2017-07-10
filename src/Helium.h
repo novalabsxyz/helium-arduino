@@ -84,18 +84,8 @@ class Helium
      *
      * @see Helium#connect()
      */
-    int connect(struct connection * connection, uint32_t retries);
-
-    /** Short form connect to the Helium Network.
-     *
-     * This is the recommended connect call. It assumes no connection
-     * state and tries to connect for up to a 5 seconds.
-     *
-     */
-    int connect()
-    {
-        return connect(NULL, HELIUM_POLL_RETRIES_5S);
-    }
+    int connect(struct connection * connection = NULL,
+                uint32_t            retries    = HELIUM_POLL_RETRIES_5S);
 
     /** Check if the Atom is connected to the network
      *
@@ -116,18 +106,8 @@ class Helium
      *
      * @see Helium::sleep() for the easy version.
      */
-    int sleep(struct connection * connection);
+    int sleep(struct connection * connection = NULL);
 
-    /** Disconnect the Atom and put it to sleep.
-     *
-     * This is the convenience version of sleep. A subsequent connect
-     * call will go through a normal connect cycle.
-     *
-     */
-    int  sleep()
-    {
-        return sleep(NULL);
-    }
 
   private:
     struct helium_ctx _ctx;
@@ -224,10 +204,35 @@ class Channel
      * that the token represents.
      *
      * @param token The token to check for
-     * @param result The out parameter for the result of the given request token
+     * @param result[out] The result of the given request token
      * @param retries The number of times to retry
      */
-    int poll(uint16_t token, int8_t * result, uint32_t retries);
+    int poll_result(uint16_t token,
+                    int8_t * result,
+                    uint32_t retries = HELIUM_POLL_RETRIES_5S);
+
+    /** Poll for data on a channel.
+     *
+     * This polls the Helium Atom for the given number of retries for
+     * any data on a given `channel`.
+     *
+     * If successful the result will be helium_status_OK and the given
+     * `data` buffer will be filled with the received data. The `used`
+     * out parameter will be set to the number of bytes read. Note
+     * that the maximum number of bytes that can be sent is set by
+     * HELIUM_MAX_DATA_SIZE.
+     *
+     * @param channel_id The channel to check for
+     * @param[out] data The data buffer to fill with received data
+     * @param len The available length of the data buffer
+     * @param[out] used On success the number of bytes used up in data
+     * @param retries The number of times to retry
+     */
+    int poll_data(uint16_t channel_id,
+                  void *   data,
+                  size_t   len,
+                  size_t * used,
+                  uint32_t retries = HELIUM_POLL_RETRIES_5S);
 
   private:
     Helium * _helium;
