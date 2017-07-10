@@ -104,6 +104,16 @@ class Helium
      */
     int sleep(struct connection * connection = NULL);
 
+    /** Checks if the Atom needs resetting.
+     *
+     * Checks if the Atom needs a reset. This is set over the air by
+     * the Helium network when the Helium Atom has a firmware update
+     * ready to apply.
+     *
+     * @returns true if the Atom needs to be reset, false otherwise.
+     */
+    bool needs_reset();
+
     /** Resets the Atom.
      *
      * This resets the Atom. Use this method when `needs_reset`
