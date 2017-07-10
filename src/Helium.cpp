@@ -122,6 +122,13 @@ Helium::sleep(struct connection * connection)
     return helium_sleep(&_ctx, connection);
 }
 
+int
+Helium::reset()
+{
+    return helium_reset(&_ctx);
+}
+
+
 //
 // Channel
 //

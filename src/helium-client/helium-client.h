@@ -1,6 +1,6 @@
 /*
  * Copyright 2017, Helium Systems, Inc.
- * All Rights Reserved. See LICENCE.txt for license information
+ * All Rights Reserved. See LICENSE.txt for license information
  */
 
 #ifndef HELIUM_CLIENT_H
@@ -74,6 +74,8 @@ helium_connect(struct helium_ctx * ctx,
 int
 helium_sleep(struct helium_ctx * ctx, struct connection * connection);
 
+int
+helium_reset(struct helium_ctx * ctx);
 
 int
 helium_poll(struct helium_ctx * ctx, void * data, const size_t len, size_t * used);

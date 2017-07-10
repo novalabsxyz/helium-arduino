@@ -81,8 +81,6 @@ class Helium
      * @param retries The number of retries to attempt to connect.
      *
      * @return helium_connect_status
-     *
-     * @see Helium#connect()
      */
     int connect(struct connection * connection = NULL,
                 uint32_t            retries    = HELIUM_POLL_RETRIES_5S);
@@ -103,11 +101,15 @@ class Helium
      * call to quick connect to the network.
      *
      * @param connection Sleep connection buffer to fill in.
-     *
-     * @see Helium::sleep() for the easy version.
      */
     int sleep(struct connection * connection = NULL);
 
+    /** Resets the Atom.
+     *
+     * This resets the Atom. Use this method when `needs_reset`
+     * returns true to apply any pending firmware updates to the Atom.
+     */
+    int reset();
 
   private:
     struct helium_ctx _ctx;

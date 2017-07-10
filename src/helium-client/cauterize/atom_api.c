@@ -6,7 +6,7 @@
 #define FSET(FS,IX) ((FS) & (1ull << (IX)))
 
 /* schema hash */
-hashtype_t const SCHEMA_HASH_atom_api = { 0x00,0x4B,0x26,0xCB,0x70,0x35,0xDB,0x7A,0xB7,0x6E,0xDD,0xD2,0xC6,0xBB,0x65,0x74,0x7C,0xD7,0x9B,0x2F };
+hashtype_t const SCHEMA_HASH_atom_api = { 0xA4,0x4D,0x12,0xC6,0x0A,0x96,0x4D,0x8C,0x4B,0xA7,0xEE,0xE3,0xF8,0x99,0x92,0x19,0x16,0x62,0x4D,0xA5 };
 
 /* type encoders */
 R encode_res_send(EI * const _c_iter, enum res_send const * const _c_obj) {
@@ -106,6 +106,20 @@ R encode_cmd_send(EI * const _c_iter, struct cmd_send const * const _c_obj) {
   case cmd_send_tag_req: STATUS_CHECK(encode_frame_app(_c_iter, &_c_obj->req)); break;
   case cmd_send_tag_res: STATUS_CHECK(encode_res_send(_c_iter, &_c_obj->res)); break;
   }
+
+  return caut_status_ok;
+}
+
+R encode_cmd_reset(EI * const _c_iter, enum cmd_reset const * const _c_obj) {
+  caut_tag8_t _c_tag;
+
+  if (ENUM_MAX_VAL_cmd_reset < *_c_obj) {
+    return caut_status_enumeration_out_of_range;
+  }
+
+  _c_tag = (caut_tag8_t)*_c_obj;
+
+  STATUS_CHECK(encode_tag8(_c_iter, &_c_tag));
 
   return caut_status_ok;
 }
@@ -339,6 +353,7 @@ R encode_cmd(EI * const _c_iter, struct cmd const * const _c_obj) {
   case cmd_tag_sleep: STATUS_CHECK(encode_cmd_sleep(_c_iter, &_c_obj->sleep)); break;
   case cmd_tag_baud: STATUS_CHECK(encode_cmd_baud(_c_iter, &_c_obj->baud)); break;
   case cmd_tag_logging: STATUS_CHECK(encode_cmd_logging(_c_iter, &_c_obj->logging)); break;
+  case cmd_tag_reset: STATUS_CHECK(encode_cmd_reset(_c_iter, &_c_obj->reset)); break;
   }
 
   return caut_status_ok;
@@ -451,6 +466,19 @@ R decode_cmd_send(DI * const _c_iter, struct cmd_send * const _c_obj) {
   case cmd_send_tag_req: STATUS_CHECK(decode_frame_app(_c_iter, &_c_obj->req)); break;
   case cmd_send_tag_res: STATUS_CHECK(decode_res_send(_c_iter, &_c_obj->res)); break;
   }
+
+  return caut_status_ok;
+}
+
+R decode_cmd_reset(DI * const _c_iter, enum cmd_reset * const _c_obj) {
+  caut_tag8_t _c_tag;
+  STATUS_CHECK(decode_tag8(_c_iter, &_c_tag));
+
+  if (ENUM_MAX_VAL_cmd_reset < _c_tag) {
+    return caut_status_enumeration_out_of_range;
+  }
+
+  *_c_obj = (enum cmd_reset)_c_tag;
 
   return caut_status_ok;
 }
@@ -694,6 +722,7 @@ R decode_cmd(DI * const _c_iter, struct cmd * const _c_obj) {
   case cmd_tag_sleep: STATUS_CHECK(decode_cmd_sleep(_c_iter, &_c_obj->sleep)); break;
   case cmd_tag_baud: STATUS_CHECK(decode_cmd_baud(_c_iter, &_c_obj->baud)); break;
   case cmd_tag_logging: STATUS_CHECK(decode_cmd_logging(_c_iter, &_c_obj->logging)); break;
+  case cmd_tag_reset: STATUS_CHECK(decode_cmd_reset(_c_iter, &_c_obj->reset)); break;
   }
 
   return caut_status_ok;
@@ -742,6 +771,10 @@ void init_res_poll(struct res_poll * _c_obj) {
 void init_cmd_send(struct cmd_send * _c_obj) {
   _c_obj->_tag = (caut_tag8_t) cmd_send_tag_req;
   init_frame_app(&_c_obj->req);
+}
+
+void init_cmd_reset(enum cmd_reset * _c_obj) {
+  *_c_obj = cmd_reset_req;
 }
 
 void init_cmd_poll(struct cmd_poll * _c_obj) {
@@ -909,6 +942,10 @@ enum caut_ord compare_cmd_send(struct cmd_send const * const _c_a, struct cmd_se
   }
 
   return _c_o;
+}
+
+enum caut_ord compare_cmd_reset(enum cmd_reset const * const _c_a, enum cmd_reset const * const _c_b) {
+  return CAUT_ORDER(*_c_a, *_c_b);
 }
 
 enum caut_ord compare_cmd_poll(struct cmd_poll const * const _c_a, struct cmd_poll const * const _c_b) {
@@ -1171,6 +1208,9 @@ enum caut_ord compare_cmd(struct cmd const * const _c_a, struct cmd const * cons
     break;
   case cmd_tag_logging:
     _c_o = compare_cmd_logging(&_c_a->logging, &_c_b->logging);
+    break;
+  case cmd_tag_reset:
+    _c_o = compare_cmd_reset(&_c_a->reset, &_c_b->reset);
     break;
   }
 

@@ -31,6 +31,7 @@ struct message_atom_api {
     struct frame_app msg_frame_app;
     struct res_poll msg_res_poll;
     struct cmd_send msg_cmd_send;
+    enum cmd_reset msg_cmd_reset;
     struct cmd_poll msg_cmd_poll;
     struct cmd_mac msg_cmd_mac;
     struct cmd_logging msg_cmd_logging;

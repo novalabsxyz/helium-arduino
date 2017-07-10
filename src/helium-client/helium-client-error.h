@@ -1,6 +1,6 @@
 /*
  * Copyright 2017, Helium Systems, Inc.
- * All Rights Reserved. See LICENCE.txt for license information
+ * All Rights Reserved. See LICENSE.txt for license information
  */
 
 #ifndef HELIUM_ERROR_H
@@ -42,6 +42,12 @@ enum helium_sleep_status
     helium_sleep_ERR_NOT_CONNECTED = helium_status_ERR_NOT_CONNECTED,
     helium_sleep_ERR_KEEP_AWAKE    = helium_status_ERR_KEEP_AWAKE,
     helium_sleep_ERR_COMMUNICATION = helium_status_ERR_COMMUNICATION,
+};
+
+enum helium_reset_status
+{
+    helium_reset_OK                = helium_status_OK,
+    helium_reset_ERR_COMMUNICATION = helium_status_ERR_COMMUNICATION,
 };
 
 enum helium_poll_status

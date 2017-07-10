@@ -8,7 +8,7 @@
 #define VERSION_atom_api "1.0.0"
 #define MIN_SIZE_atom_api (1)
 #define MAX_SIZE_atom_api (110)
-#define NUM_TYPES_atom_api (22)
+#define NUM_TYPES_atom_api (23)
 
 /* schema hash */
 extern hashtype_t const SCHEMA_HASH_atom_api;
@@ -22,21 +22,22 @@ enum type_index_atom_api {
   type_index_atom_api_frame_app = 4,
   type_index_atom_api_res_poll = 5,
   type_index_atom_api_cmd_send = 6,
-  type_index_atom_api_cmd_poll = 7,
-  type_index_atom_api_cmd_mac = 8,
-  type_index_atom_api_cmd_logging = 9,
-  type_index_atom_api_cmd_info = 10,
-  type_index_atom_api_cmd_connected = 11,
-  type_index_atom_api_atom_baud = 12,
-  type_index_atom_api_cmd_baud = 13,
-  type_index_atom_api_arr_u8_32 = 14,
-  type_index_atom_api_connection = 15,
-  type_index_atom_api_req_connect = 16,
-  type_index_atom_api_cmd_connect = 17,
-  type_index_atom_api_res_sleep = 18,
-  type_index_atom_api_cmd_sleep = 19,
-  type_index_atom_api_cmd = 20,
-  type_index_atom_api_txn = 21,
+  type_index_atom_api_cmd_reset = 7,
+  type_index_atom_api_cmd_poll = 8,
+  type_index_atom_api_cmd_mac = 9,
+  type_index_atom_api_cmd_logging = 10,
+  type_index_atom_api_cmd_info = 11,
+  type_index_atom_api_cmd_connected = 12,
+  type_index_atom_api_atom_baud = 13,
+  type_index_atom_api_cmd_baud = 14,
+  type_index_atom_api_arr_u8_32 = 15,
+  type_index_atom_api_connection = 16,
+  type_index_atom_api_req_connect = 17,
+  type_index_atom_api_cmd_connect = 18,
+  type_index_atom_api_res_sleep = 19,
+  type_index_atom_api_cmd_sleep = 20,
+  type_index_atom_api_cmd = 21,
+  type_index_atom_api_txn = 22,
 };
 
 /* type definitions */
@@ -105,6 +106,12 @@ struct cmd_send {
     enum res_send res;
   };
 
+};
+
+#define ENUM_MAX_VAL_cmd_reset (cmd_reset_res)
+enum cmd_reset {
+  cmd_reset_req = 0,
+  cmd_reset_res = 1,
 };
 
 #define UNION_NUM_FIELDS_cmd_poll (0x2ull)
@@ -292,7 +299,7 @@ struct cmd_sleep {
 
 };
 
-#define UNION_NUM_FIELDS_cmd (0x8ull)
+#define UNION_NUM_FIELDS_cmd (0x9ull)
 struct cmd {
   enum cmd_tag {
     cmd_tag_info = 0,
@@ -303,6 +310,7 @@ struct cmd {
     cmd_tag_sleep = 5,
     cmd_tag_baud = 6,
     cmd_tag_logging = 7,
+    cmd_tag_reset = 8,
   } _tag;
 
 
@@ -315,6 +323,7 @@ struct cmd {
     struct cmd_sleep sleep;
     struct cmd_baud baud;
     struct cmd_logging logging;
+    enum cmd_reset reset;
   };
 
 };
@@ -361,6 +370,11 @@ enum caut_status encode_cmd_send(struct caut_encode_iter * const _c_iter, struct
 enum caut_status decode_cmd_send(struct caut_decode_iter * const _c_iter, struct cmd_send * const _c_obj);
 void init_cmd_send(struct cmd_send * _c_obj);
 enum caut_ord compare_cmd_send(struct cmd_send const * const _c_a, struct cmd_send const * const _c_b);
+
+enum caut_status encode_cmd_reset(struct caut_encode_iter * const _c_iter, enum cmd_reset const * const _c_obj);
+enum caut_status decode_cmd_reset(struct caut_decode_iter * const _c_iter, enum cmd_reset * const _c_obj);
+void init_cmd_reset(enum cmd_reset * _c_obj);
+enum caut_ord compare_cmd_reset(enum cmd_reset const * const _c_a, enum cmd_reset const * const _c_b);
 
 enum caut_status encode_cmd_poll(struct caut_encode_iter * const _c_iter, struct cmd_poll const * const _c_obj);
 enum caut_status decode_cmd_poll(struct caut_decode_iter * const _c_iter, struct cmd_poll * const _c_obj);
