@@ -14,6 +14,45 @@
 Helium  helium(&atom_serial);
 Channel channel(&helium);
 
+
+void
+setup()
+{
+    Serial.begin(9600);
+    Serial.println("Starting");
+
+    // Begin communication with the Helium Atom
+    // The baud rate differs per supported board
+    // and is configured in Board.h
+    helium.begin(HELIUM_BAUD_RATE);
+
+    // Connect the Atom to the Helium Network
+    connect();
+    // and ensure the channel is created
+    channel_create(CHANNEL_NAME);
+}
+
+
+void
+loop()
+{
+    // Create a buffer of the maximum Helium network packet size
+    char   data[HELIUM_MAX_DATA_SIZE];
+    size_t data_used;
+
+    // Call the poll utility function below which pings the network to
+    // ask for data.
+    channel_poll(data, HELIUM_MAX_DATA_SIZE, &data_used);
+    // Convert to a printable string
+    data[data_used] = '\0';
+    if (data_used > 0)
+    {
+        Serial.print("Data - ");
+        Serial.println(data);
+    }
+}
+
+
 void
 report_status(int status, int result = 0)
 {
@@ -71,59 +110,25 @@ channel_create(const char * channel_name)
 void
 channel_poll(void * data, size_t len, size_t * used)
 {
-    int    status;
+    int status;
     do
     {
-        Serial.println("Polling - ");
+        Serial.print("Polling - ");
+        // Poll the channel for some data for some time
         status = channel.poll_data(data, len, used);
+
+        if (helium_status_OK_NO_DATA == status)
+        {
+            // The Helium Network will deliver pending channel data as
+            // soon as it sees any channel messages from a Helium
+            // Atom. In normal usecases this will be when the device
+            // delivers some valuable data to a channel. We fake it
+            // here by just sending some empty data to the channel to
+            // get the network to trigger if there's anything out
+            // there.
+            channel.send(NULL, 0, (int8_t *)NULL);
+        }
+
         report_status(status);
     } while (helium_status_OK != status);
-}
-
-void
-setup()
-{
-    Serial.begin(9600);
-    Serial.println("Starting");
-
-    // Begin communication with the Helium Atom
-    // The baud rate differs per supported board
-    // and is configured in Board.h
-    helium.begin(HELIUM_BAUD_RATE);
-
-    // Connect the Atom to the Helium Network
-    connect();
-    // and ensure the channel is created
-    channel_create(CHANNEL_NAME);
-
-    pinMode(LED_BUILTIN, OUTPUT);
-}
-
-
-#define CMD_LED_ON "on"
-#define CMD_LED_OFF "off"
-
-void
-loop()
-{
-    char data[HELIUM_MAX_DATA_SIZE];
-    size_t data_used;
-
-    channel_poll(data, HELIUM_MAX_DATA_SIZE, &data_used);
-    if (data_used > 0)
-    {
-        Serial.print("Command - ");
-        if (strncmp(CMD_LED_ON, data, data_used))
-        {
-            digitalWrite(LED_BUILTIN, HIGH);
-            Serial.println("ON");
-        } else if (strncmp(CMD_LED_OFF, data, data_used))
-        {
-            digitalWrite(LED_BUILTIN, LOW);
-            Serial.println("OFF");
-        }
-    }
-
-    // Wait a while till the next poll
-    delay(5000);
 }
