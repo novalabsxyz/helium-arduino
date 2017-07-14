@@ -226,7 +226,7 @@ class Channel
     /** Poll for data on a channel.
      *
      * This polls the Helium Atom for the given number of retries for
-     * any data on a given `channel`.
+     * any data on the channel.
      *
      * If successful the result will be helium_status_OK and the given
      * `data` buffer will be filled with the received data. The `used`
@@ -240,8 +240,7 @@ class Channel
      * @param[out] used On success the number of bytes used up in data
      * @param retries The number of times to retry
      */
-    int poll_data(uint16_t channel_id,
-                  void *   data,
+    int poll_data(void *   data,
                   size_t   len,
                   size_t * used,
                   uint32_t retries = HELIUM_POLL_RETRIES_5S);

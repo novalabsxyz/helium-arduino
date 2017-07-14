@@ -10,19 +10,8 @@
 Helium  helium(&atom_serial);
 Channel channel(&helium);
 
-void report_status(int status)
-{
-    if (helium_status_OK == status)
-    {
-        Serial.println("Succeeded");
-    }
-    else
-    {
-        Serial.println("Failed");
-    }
-}
-
-void report_status_result(int status, int result)
+void
+report_status(int status, int result = 0)
 {
     if (helium_status_OK == status)
     {
@@ -30,7 +19,8 @@ void report_status_result(int status, int result)
         {
             Serial.println("Succeeded");
         }
-        else {
+        else
+        {
             Serial.print("Failed - ");
             Serial.println(result);
         }
@@ -67,7 +57,7 @@ setup()
     Serial.print("Creating Channel - ");
     status = channel.begin("Helium MQTT", &result);
     // Print status and result
-    report_status_result(status, result);
+    report_status(status, result);
 }
 
 void
@@ -80,7 +70,7 @@ loop()
     Serial.print("Sending - ");
     int    status = channel.send(data, strlen(data), &result);
     // Print status and result
-    report_status_result(status, result);
+    report_status(status, result);
 
     // Wait a while till the next time
     delay(5000);

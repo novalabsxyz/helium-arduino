@@ -194,14 +194,13 @@ Channel::poll_result(uint16_t token, int8_t * result, uint32_t retries)
 }
 
 int
-Channel::poll_data(uint16_t channel_id,
-                   void *   data,
+Channel::poll_data(void *   data,
                    size_t   len,
                    size_t * used,
                    uint32_t retries)
 {
     return helium_channel_poll_data(&_helium->_ctx,
-                                    channel_id,
+                                    _channel_id,
                                     data,
                                     len,
                                     used,
