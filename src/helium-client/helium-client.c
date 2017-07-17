@@ -578,7 +578,13 @@ helium_channel_poll_data(struct helium_ctx * ctx,
                          size_t *            used,
                          uint32_t            retries)
 {
-    uint16_t token = _mk_token(CHANNEL_DATA, channel_id);
+    uint16_t                token = _mk_token(CHANNEL_DATA, channel_id);
+    enum helium_poll_status status =
+        helium_channel_poll_token(ctx, token, data, len, used, 0);
+    if (helium_poll_OK_NO_DATA == status)
+    {
+        helium_channel_send(ctx, 0, NULL, 0, NULL);
+    }
     return helium_channel_poll_token(ctx, token, data, len, used, retries);
 }
 
