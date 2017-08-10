@@ -16,7 +16,7 @@ docs:
 .PHONY: clean
 ci:
 	for e in examples/*; do \
-	  platformio ci --board=${BOARD} --lib=. $$e/*; \
+	  platformio ci --board=${BOARD} --lib=. -C $$e/platformio.ini $$e/*; \
 	done
 
 .PHONY: version
