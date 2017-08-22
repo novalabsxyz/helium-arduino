@@ -234,7 +234,6 @@ class Channel
      * that the maximum number of bytes that can be sent is set by
      * HELIUM_MAX_DATA_SIZE.
      *
-     * @param channel_id The channel to check for
      * @param[out] data The data buffer to fill with received data
      * @param len The available length of the data buffer
      * @param[out] used On success the number of bytes used up in data
