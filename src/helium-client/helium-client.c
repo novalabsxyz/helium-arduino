@@ -325,7 +325,7 @@ helium_connect(struct helium_ctx * ctx,
         return helium_connect_ERR_COMMUNICATION;
     }
 
-    while (retries-- > 0)
+    while (retries-- >= 0)
     {
         enum helium_connected_status connected_status = helium_connected(ctx);
         switch (connected_status)
