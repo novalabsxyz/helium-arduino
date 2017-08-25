@@ -14,6 +14,7 @@ enum helium_status
     helium_status_ERR_NOT_CONNECTED,
     helium_status_ERR_DROPPED,
     helium_status_ERR_KEEP_AWAKE,
+    helium_status_ERR_CODING,
 };
 
 enum helium_info_status
@@ -71,6 +72,15 @@ enum helium_channel_send_status
     helium_channel_send_ERR_NOT_CONNECTED = helium_status_ERR_NOT_CONNECTED,
     helium_channel_send_ERR_DROPPED       = helium_status_ERR_DROPPED,
     helium_channel_send_ERR_COMMUNICATION = helium_status_ERR_COMMUNICATION,
+};
+
+enum helium_channel_config_get_status
+{
+    helium_channel_config_get_OK                = helium_status_OK,
+    helium_channel_config_get_ERR_NOT_CONNECTED = helium_status_ERR_NOT_CONNECTED,
+    helium_channel_config_get_ERR_DROPPED       = helium_status_ERR_DROPPED,
+    helium_channel_config_get_ERR_COMMUNICATION = helium_status_ERR_COMMUNICATION,
+    helium_channel_config_get_ERR_CODING        = helium_status_ERR_CODING,
 };
 
 

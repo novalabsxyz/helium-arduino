@@ -125,6 +125,7 @@ class Helium
     struct helium_ctx _ctx;
 
     friend class Channel;
+    friend class Config;
 };
 
 /**
@@ -186,8 +187,8 @@ class Channel
      *
      * The Channel#begin(const char *) method is a synchronous version
      * of this method. Sending a request to a channel returns a
-     * `token` which can be used in a subsequent call to #poll() to
-     * check for results from the remote channel.
+     * `token` which can be used in a subsequent call to
+     * #poll_result() to check for results from the remote channel.
      *
      * @param name The name of the channel to authenticate with.
      * @param token The output parameter for the pending result token.
@@ -216,7 +217,7 @@ class Channel
      * that the token represents.
      *
      * @param token The token to check for
-     * @param result[out] The result of the given request token
+     * @param[out] result The result of the given request token
      * @param retries The number of times to retry
      */
     int poll_result(uint16_t token,
@@ -247,6 +248,324 @@ class Channel
   private:
     Helium * _helium;
     int8_t   _channel_id;
+
+    friend class Config;
+};
+
+
+enum config_poll_get_status
+{
+    config_status_POLL_FOUND      = 0,
+    config_status_POLL_FOUND_NULL = -1,
+    config_status_POLL_ERR_TYPE   = -2,
+};
+
+
+/**
+ * \class Config
+ *
+ * \brief A Channel Configuration
+ *
+ * Channels can have configuration data for the Helium Atom
+ * available. Depending on the IoT platform the configuration data is
+ * a representation of device configuration. Other terms used are
+ * device "twins" or "shadows".
+ *
+ * To use a channel configuration construct it with a channel that
+ * supports configuration and use the get methods to retrieve
+ * configuration values from the IoT platform's device
+ * representation. Use the set methods to set values in the IoT
+ * platform's representation of the device.
+ *
+ * Note that most IoT platforms represent sets and gets in different
+ * namespaces. The get methods represent the IoT platform's desired or
+ * expected namespace of the device, while the set methods are
+ * reflected in the actual, or current namespace of the device.
+ *
+ */
+class Config
+{
+  public:
+    /** Construct a Configuration
+     *
+     * @param channel The channel to get/set configuration with
+     */
+    Config(Channel * channel);
+
+    /** Get an integer configuration value
+     *
+     * @param key The configuration key to get
+     * @param[out] value The target for the received value
+     * @param retries The number of times to retry (optional)
+     * @returns 0 on success. If the result is > 0 the result code is
+     *     one of the helium_status_ error codes. If the result is < 0
+     *     it is one of the config_poll_get_status error codes
+     */
+    int get(const char * key,
+            int32_t *    value,
+            int32_t      default_value,
+            uint32_t     retries = HELIUM_POLL_RETRIES_5S)
+    {
+        return _get(key,
+                    helium_config_i32,
+                    value,
+                    sizeof(*value),
+                    &default_value,
+                    sizeof(default_value),
+                    retries);
+    }
+
+    /** Get a float configuration value
+     *
+     * @param key The configuration key to get
+     * @param[out] value The target for the received value
+     * @param retries The number of times to retry (optional)
+     * @returns 0 on success. If the result is > 0 the result code is
+     *     one of the helium_status_ error codes. If the result is < 0
+     *     it is one of the config_poll_get_status error codes
+     */
+    int get(const char * key,
+            float *      value,
+            float        default_value,
+            uint32_t     retries = HELIUM_POLL_RETRIES_5S)
+    {
+        return _get(key,
+                    helium_config_f32,
+                    value,
+                    sizeof(*value),
+                    &default_value,
+                    sizeof(default_value),
+                    retries);
+    }
+
+
+    /** Get a boolean configuration value
+     *
+     * @param key The configuration key to get
+     * @param[out] value The target for the received value
+     * @param retries The number of times to retry (optional)
+     * @returns 0 on success. If the result is > 0 the result code is
+     *     one of the helium_status_ error codes. If the result is < 0
+     *     it is one of the config_poll_get_status error codes
+     */
+    int get(const char * key,
+            bool *       value,
+            bool         default_value,
+            uint32_t     retries = HELIUM_POLL_RETRIES_5S)
+    {
+        return _get(key,
+                    helium_config_bool,
+                    value,
+                    sizeof(*value),
+                    &default_value,
+                    sizeof(default_value),
+                    retries);
+    }
+
+    /** Get a string configuration value
+     *
+     * @param key The configuration key to get
+     * @param[out] value The target buffer for the received string
+     * @param value_len The length of the available buffer space
+     * @param retries The number of times to retry (optional)
+     * @returns 0 on success. If the result is > 0 the result code is
+     *     one of the helium_status_ error codes. If the result is < 0
+     *     it is one of the config_poll_get_status error codes
+     */
+    int get(const char * key,
+            char *       value,
+            size_t       value_len,
+            char *       default_value,
+            size_t       default_value_len,
+            uint32_t     retries = HELIUM_POLL_RETRIES_5S)
+    {
+        return _get(key,
+                    helium_config_str,
+                    value,
+                    value_len,
+                    default_value,
+                    default_value_len,
+                    retries);
+    }
+
+    /** Send a request for a configuration value.
+     *
+     * Getting a configuration value requires sending a request with
+     * the configuration key and then using the resulting token in a
+     * #poll_get_result() call to wait for a response.
+     *
+     * @param key The configuration key to get
+     * @param[out] token The token representing the response.
+     * @returns 0 on success. One of the helium_status_ error
+     *     codes otherwise.
+     */
+    int get(const char * key, uint16_t * token);
+
+    /** Poll the response of a configuration request.
+     *
+     * Polls the given token and validates any response against the
+     * given configuration key and expected type. If these match the
+     * value is copied into the given value buffer.
+     *
+     * Note: The short form methods for getting config values hide
+     * most of the complexity required to make a configuration get
+     * work.
+     *
+     * @param token The token returned from a previous #get() request
+     * @param config_key The configuration key to check for
+     * @param config_type The configuration type to check for
+     * @param[out] value The destination buffer to copy the result into
+     * @param value_len The size of the given destination buffer
+     * @param retries The number of times to retry (optional)
+     * @returns 0 on success. If the result is > 0 the result code is
+     *     one of the helium_status_ error codes. If the result is < 0
+     *     it is one of the config_poll_get_status error codes
+     */
+    int poll_get_result(uint16_t                token,
+                        const char *            config_key,
+                        enum helium_config_type config_type,
+                        void *                  value,
+                        size_t                  value_len,
+                        void *                  default_value,
+                        size_t                  default_value_len,
+                        uint32_t retries = HELIUM_POLL_RETRIES_5S);
+
+    /** Set a float configuration value
+     *
+     * @param key The configuration key to set
+     * @param value The value to set
+     * @param retries The number of times to retry (optional)
+     * @returns 0 on success. One of the helium_status_ error
+     *     codes otherwise.
+     */
+    int set(const char * key, float value, uint32_t retries = HELIUM_POLL_RETRIES_5S)
+    {
+        return _set(key, helium_config_f32, &value, retries);
+    }
+
+    /** Set an integer configuration value
+     *
+     * @param key The configuration key to set
+     * @param value The value to set
+     * @param retries The number of times to retry (optional)
+     * @returns 0 on success. One of the helium_status_ error
+     *     codes otherwise.
+     */
+    int set(const char * key,
+            int32_t      value,
+            uint32_t     retries = HELIUM_POLL_RETRIES_5S)
+    {
+        return _set(key, helium_config_i32, &value, retries);
+    }
+
+    /** Set a boolean configuration value
+     *
+     * @param key The configuration key to set
+     * @param value The value to set
+     * @param retries The number of times to retry (optional)
+     * @returns 0 on success. One of the helium_status_ error
+     *     codes otherwise.
+     */
+    int set(const char * key, bool value, uint32_t retries = HELIUM_POLL_RETRIES_5S)
+    {
+        return _set(key, helium_config_bool, &value, retries);
+    }
+
+    /** Set a string configuration value
+     *
+     * @param key The configuration key to set
+     * @param value The value to set
+     * @param retries The number of times to retry (optional)
+     * @returns 0 on success. One of the helium_status_ error
+     *     codes otherwise.
+     */
+    int set(const char * key,
+            const char * value,
+            uint32_t     retries = HELIUM_POLL_RETRIES_5S)
+    {
+        return _set(key, helium_config_str, &value, retries);
+    }
+
+    /** Set a null configuration value
+     *
+     * @param key The configuration key to set
+     * @param retries The number of times to retry (optional)
+     * @returns 0 on success. One of the helium_status_ error
+     *     codes otherwise.
+     */
+    int set_null(const char * key, uint32_t retries = HELIUM_POLL_RETRIES_5S)
+    {
+        return _set(key, helium_config_null, NULL, retries);
+    }
+
+    /** Send a request for setting a configuration value.
+     *
+     * Setting a configuration value requires sending a request with
+     * the configuration key, the value type and the value and then
+     * using the resulting token in a #poll_set_result() call to wait
+     * for a response.
+     *
+     * @param key The configuration key to set
+     * @param value_type The type of the configuration value to set
+     * @param value A pointer to the value that needs to be st
+     * @param[out] token The token representing the response.
+     * @returns 0 on success. One of the helium_status_ error
+     *     codes otherwise.
+     */
+    int set(const char *       key,
+            helium_config_type value_type,
+            void *             value,
+            uint16_t *         token);
+
+    /** Poll the response of a configuration set request.
+     *
+     * Polls the given token and returns the result code of the set
+     * request.
+     *
+     * Note: The short form methods for getting config values hide
+     * most of the complexity required to make a configuration get
+     * work.
+     *
+     * @param token The token returned from a previous #set() request
+     * @param[out] result A pointer to storage for the response code
+     * @param retries The number of times to retry (optional)
+     * @returns A helium_status result code for the actual
+     *     communication part. If the result is helium_status_OK, the
+     *     result code can be used to check if the set was
+     *     successful. The result code will be 0 on success, and
+     *     non-zero otherwise.
+     */
+    int poll_set_result(uint16_t token,
+                        int8_t * result,
+                        uint32_t retries = HELIUM_POLL_RETRIES_5S);
+
+    /** Check whether configuration values are stale.
+     *
+     * Checks whether there has been a system indication that
+     * configuration attributes may have gone stale.
+     *
+     * When this returns true you should assume that any configuration
+     * values you have previously retrieved are no longer valid.
+     *
+     * @returns true if previous configuration values are stale, false
+     *     if not
+     */
+    bool is_stale();
+
+
+  private:
+    int       _get(const char *            config_key,
+                   enum helium_config_type config_type,
+                   void *                  value,
+                   size_t                  value_len,
+                   void *                  default_value,
+                   size_t                  default_value_len,
+                   uint32_t                retries);
+    int       _set(const char *            config_key,
+                   enum helium_config_type value_type,
+                   void *                  value,
+                   uint32_t                retries);
+    Channel * _channel;
 };
 
 #endif // HELIUM_H

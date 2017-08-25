@@ -194,10 +194,7 @@ Channel::poll_result(uint16_t token, int8_t * result, uint32_t retries)
 }
 
 int
-Channel::poll_data(void *   data,
-                   size_t   len,
-                   size_t * used,
-                   uint32_t retries)
+Channel::poll_data(void * data, size_t len, size_t * used, uint32_t retries)
 {
     return helium_channel_poll_data(&_helium->_ctx,
                                     _channel_id,
@@ -205,4 +202,185 @@ Channel::poll_data(void *   data,
                                     len,
                                     used,
                                     retries);
+}
+
+//
+// Config
+//
+
+Config::Config(Channel * channel)
+{
+    _channel = channel;
+}
+
+int
+Config::get(const char * key, uint16_t * token)
+{
+    return helium_channel_config_get(&_channel->_helium->_ctx,
+                                     _channel->_channel_id,
+                                     key,
+                                     token);
+}
+
+
+int
+Config::_get(const char *            config_key,
+             enum helium_config_type config_type,
+             void *                  value,
+             size_t                  value_len,
+             void *                  default_value,
+             size_t                  default_value_len,
+             uint32_t                retries)
+{
+    uint16_t token;
+    int      status = get(config_key, &token);
+    if (helium_status_OK == status)
+    {
+        status =
+            poll_get_result(token, config_key, config_type, value, value_len);
+    }
+    if (config_status_POLL_FOUND_NULL)
+    {
+        size_t dest_len =
+            default_value_len > value_len ? value_len : default_value_len;
+        memcpy(value, default_value, dest_len);
+    }
+    return status;
+}
+
+
+/** Context for the poll_get handlder
+ *
+ * An instance of this if filled in the #Config::poll_get_result
+ * implementation and the result of the poll handler is returned in
+ * the status field
+ */
+struct _poll_get_context
+{
+    //! The config key to look for
+    const char * filter_key;
+    //! The config type to check for
+    enum helium_config_type filter_type;
+    //! The length of the destination buffer
+    size_t dest_len;
+    //! The destination buffer
+    void * dest;
+    //! The result status of the result handler
+    enum config_poll_get_status status;
+};
+
+
+static bool
+_poll_get_result_handler(void *                  handler_ctx,
+                         const char *            key,
+                         enum helium_config_type value_type,
+                         void *                  value)
+{
+    struct _poll_get_context * ctx = (struct _poll_get_context *)handler_ctx;
+    if (strcmp(ctx->filter_key, key) != 0)
+    {
+        // Not the right key, keep going
+        return true;
+    }
+    if (value_type != ctx->filter_type)
+    {
+        // Found, not the right type, stop
+        ctx->status = config_status_POLL_ERR_TYPE;
+        return false;
+    }
+
+    // Found and right type, copy into destination
+    size_t dest_len = ctx->dest_len;
+    switch (value_type)
+    {
+    case helium_config_bool:
+    case helium_config_f32:
+    case helium_config_i32:
+        break;
+    case helium_config_str:
+    {
+        size_t str_len = strlen((char *)value) + 1;
+        if (str_len < dest_len)
+        {
+            dest_len = str_len;
+        }
+        else
+        {
+            dest_len -= 1;
+            ((char *)ctx->dest)[dest_len] = '\0';
+        }
+    }
+    break;
+    case helium_config_null:
+        dest_len = 0;
+        break;
+    }
+    memcpy(ctx->dest, value, dest_len);
+    ctx->status = config_status_POLL_FOUND;
+    return false;
+}
+
+int
+Config::poll_get_result(uint16_t           token,
+                        const char *       config_key,
+                        helium_config_type value_type,
+                        void *             value,
+                        size_t             value_len,
+                        uint32_t           retries)
+{
+    struct _poll_get_context handler_ctx = {
+        .filter_key  = config_key,
+        .filter_type = value_type,
+        .dest_len    = value_len,
+        .dest        = value,
+        .status      = config_status_POLL_ERR_NOTFOUND,
+    };
+    int status = helium_channel_config_get_poll_result(&_channel->_helium->_ctx,
+                                                       token,
+                                                       _poll_get_result_handler,
+                                                       &handler_ctx,
+                                                       retries);
+    return status != helium_status_OK ? status : handler_ctx.status;
+}
+
+int
+Config::set(const char *       config_key,
+            helium_config_type config_type,
+            void *             value,
+            uint16_t *         token)
+{
+    return helium_channel_config_set(&_channel->_helium->_ctx,
+                                     _channel->_channel_id,
+                                     config_key,
+                                     config_type,
+                                     value,
+                                     token);
+}
+
+int
+Config::_set(const char *            config_key,
+             enum helium_config_type value_type,
+             void *                  value,
+             uint32_t                retries)
+{
+    uint16_t token;
+    int      status = set(config_key, value_type, value, &token);
+    int8_t   result = 0;
+    if (helium_status_OK == status)
+    {
+        status = poll_set_result(token, &result, retries);
+    }
+    if (helium_status_OK == status && result != 0)
+    {
+        status = helium_status_ERR_COMMUNICATION;
+    }
+    return status;
+}
+
+bool
+Config::is_stale()
+{
+    bool result = false;
+    helium_channel_config_poll_invalidate(&_channel->_helium->_ctx, _channel->_channel_id, &result, 0);
+    return result;
 }
