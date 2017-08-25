@@ -138,15 +138,15 @@ Helium::reset()
 // Channel
 //
 
-Channel::Channel(Helium * helium)
+Channel::Channel(Helium * aHelium)
 {
-    _helium = helium;
+    helium = aHelium;
 }
 
 int
 Channel::begin(const char * name, uint16_t * token)
 {
-    return helium_channel_create(&_helium->_ctx, name, strlen(name), token);
+    return helium_channel_create(&helium->_ctx, name, strlen(name), token);
 }
 
 int
@@ -171,7 +171,7 @@ Channel::begin(const char * name, int8_t * result)
 int
 Channel::send(void const * data, size_t len, uint16_t * token)
 {
-    return helium_channel_send(&_helium->_ctx, _channel_id, data, len, token);
+    return helium_channel_send(&helium->_ctx, _channel_id, data, len, token);
 }
 
 
@@ -190,13 +190,13 @@ Channel::send(void const * data, size_t len, int8_t * result)
 int
 Channel::poll_result(uint16_t token, int8_t * result, uint32_t retries)
 {
-    return helium_channel_poll_result(&_helium->_ctx, token, result, retries);
+    return helium_channel_poll_result(&helium->_ctx, token, result, retries);
 }
 
 int
 Channel::poll_data(void * data, size_t len, size_t * used, uint32_t retries)
 {
-    return helium_channel_poll_data(&_helium->_ctx,
+    return helium_channel_poll_data(&helium->_ctx,
                                     _channel_id,
                                     data,
                                     len,
@@ -216,7 +216,7 @@ Config::Config(Channel * channel)
 int
 Config::get(const char * key, uint16_t * token)
 {
-    return helium_channel_config_get(&_channel->_helium->_ctx,
+    return helium_channel_config_get(&_channel->helium->_ctx,
                                      _channel->_channel_id,
                                      key,
                                      token);
@@ -342,7 +342,7 @@ Config::poll_get_result(uint16_t           token,
         .default_value_len = default_value_len,
         .status            = config_status_POLL_FOUND_NULL,
     };
-    int status = helium_channel_config_get_poll_result(&_channel->_helium->_ctx,
+    int status = helium_channel_config_get_poll_result(&_channel->helium->_ctx,
                                                        token,
                                                        _poll_get_result_handler,
                                                        &handler_ctx,
@@ -356,12 +356,23 @@ Config::set(const char *       config_key,
             void *             value,
             uint16_t *         token)
 {
-    return helium_channel_config_set(&_channel->_helium->_ctx,
+    return helium_channel_config_set(&_channel->helium->_ctx,
                                      _channel->_channel_id,
                                      config_key,
                                      config_type,
                                      value,
                                      token);
+}
+
+int
+Config::poll_set_result(uint16_t token,
+                        int8_t * result,
+                        uint32_t retries)
+{
+    return helium_channel_config_set_poll_result(&_channel->helium->_ctx,
+                                                 token,
+                                                 result,
+                                                 retries);
 }
 
 int
@@ -388,7 +399,7 @@ bool
 Config::is_stale()
 {
     bool result = false;
-    helium_channel_config_poll_invalidate(&_channel->_helium->_ctx,
+    helium_channel_config_poll_invalidate(&_channel->helium->_ctx,
                                           _channel->_channel_id,
                                           &result,
                                           0);

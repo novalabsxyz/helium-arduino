@@ -245,8 +245,9 @@ class Channel
                   size_t * used,
                   uint32_t retries = HELIUM_POLL_RETRIES_5S);
 
+    Helium *helium;
+
   private:
-    Helium * _helium;
     int8_t   _channel_id;
 
     friend class Config;
