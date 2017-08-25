@@ -236,14 +236,13 @@ Config::_get(const char *            config_key,
     int      status = get(config_key, &token);
     if (helium_status_OK == status)
     {
-        status =
-            poll_get_result(token, config_key, config_type, value, value_len);
-    }
-    if (config_status_POLL_FOUND_NULL)
-    {
-        size_t dest_len =
-            default_value_len > value_len ? value_len : default_value_len;
-        memcpy(value, default_value, dest_len);
+        status = poll_get_result(token,
+                                 config_key,
+                                 config_type,
+                                 value,
+                                 value_len,
+                                 default_value,
+                                 default_value_len);
     }
     return status;
 }
@@ -261,10 +260,14 @@ struct _poll_get_context
     const char * filter_key;
     //! The config type to check for
     enum helium_config_type filter_type;
-    //! The length of the destination buffer
-    size_t dest_len;
     //! The destination buffer
     void * dest;
+    //! The length of the destination buffer
+    size_t dest_len;
+    //! The default value. Assumed to be the same type as filter_type
+    void * default_value;
+    //! The length of the default_value
+    size_t default_value_len;
     //! The result status of the result handler
     enum config_poll_get_status status;
 };
@@ -277,63 +280,67 @@ _poll_get_result_handler(void *                  handler_ctx,
                          void *                  value)
 {
     struct _poll_get_context * ctx = (struct _poll_get_context *)handler_ctx;
+    size_t                     len = ctx->dest_len;
+    void *                     src = value;
+
     if (strcmp(ctx->filter_key, key) != 0)
     {
         // Not the right key, keep going
         return true;
     }
-    if (value_type != ctx->filter_type)
+    if (value_type == ctx->filter_type)
     {
-        // Found, not the right type, stop
+        // Found and the right type
+        // Use the given value and the destination buffer size
+        ctx->status = config_status_POLL_FOUND;
+    }
+    else
+    {
+        // Found but not the right type, return an error
         ctx->status = config_status_POLL_ERR_TYPE;
-        return false;
+        // And use the context's default
+        value_type = ctx->filter_type;
+        // Us the default value as the source
+        src = ctx->default_value;
+        // Check for a shorter default value length (only really valid for
+        // strings)
+        len = len > ctx->default_value_len ? ctx->default_value_len : len;
     }
 
-    // Found and right type, copy into destination
-    size_t dest_len = ctx->dest_len;
     switch (value_type)
     {
     case helium_config_bool:
     case helium_config_f32:
     case helium_config_i32:
-        break;
     case helium_config_str:
-    {
-        size_t str_len = strlen((char *)value) + 1;
-        if (str_len < dest_len)
-        {
-            dest_len = str_len;
-        }
-        else
-        {
-            dest_len -= 1;
-            ((char *)ctx->dest)[dest_len] = '\0';
-        }
-    }
-    break;
+        break;
     case helium_config_null:
-        dest_len = 0;
+        ctx->status = config_status_POLL_FOUND_NULL;
+        len         = 0;
         break;
     }
-    memcpy(ctx->dest, value, dest_len);
-    ctx->status = config_status_POLL_FOUND;
+    memcpy(ctx->dest, src, len);
     return false;
 }
 
 int
 Config::poll_get_result(uint16_t           token,
                         const char *       config_key,
-                        helium_config_type value_type,
+                        helium_config_type config_type,
                         void *             value,
                         size_t             value_len,
+                        void *             default_value,
+                        size_t             default_value_len,
                         uint32_t           retries)
 {
     struct _poll_get_context handler_ctx = {
-        .filter_key  = config_key,
-        .filter_type = value_type,
-        .dest_len    = value_len,
-        .dest        = value,
-        .status      = config_status_POLL_ERR_NOTFOUND,
+        .filter_key        = config_key,
+        .filter_type       = config_type,
+        .dest              = value,
+        .dest_len          = value_len,
+        .default_value     = default_value,
+        .default_value_len = default_value_len,
+        .status            = config_status_POLL_FOUND_NULL,
     };
     int status = helium_channel_config_get_poll_result(&_channel->_helium->_ctx,
                                                        token,
@@ -381,6 +388,9 @@ bool
 Config::is_stale()
 {
     bool result = false;
-    helium_channel_config_poll_invalidate(&_channel->_helium->_ctx, _channel->_channel_id, &result, 0);
+    helium_channel_config_poll_invalidate(&_channel->_helium->_ctx,
+                                          _channel->_channel_id,
+                                          &result,
+                                          0);
     return result;
 }

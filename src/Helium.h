@@ -296,6 +296,7 @@ class Config
      *
      * @param key The configuration key to get
      * @param[out] value The target for the received value
+     * @param default_value The default value in case of errors
      * @param retries The number of times to retry (optional)
      * @returns 0 on success. If the result is > 0 the result code is
      *     one of the helium_status_ error codes. If the result is < 0
@@ -319,6 +320,7 @@ class Config
      *
      * @param key The configuration key to get
      * @param[out] value The target for the received value
+     * @param default_value The default value in case of errors
      * @param retries The number of times to retry (optional)
      * @returns 0 on success. If the result is > 0 the result code is
      *     one of the helium_status_ error codes. If the result is < 0
@@ -343,6 +345,7 @@ class Config
      *
      * @param key The configuration key to get
      * @param[out] value The target for the received value
+     * @param default_value The default value in case of errors
      * @param retries The number of times to retry (optional)
      * @returns 0 on success. If the result is > 0 the result code is
      *     one of the helium_status_ error codes. If the result is < 0
@@ -367,6 +370,10 @@ class Config
      * @param key The configuration key to get
      * @param[out] value The target buffer for the received string
      * @param value_len The length of the available buffer space
+     * @param default_value The default value to use if not found
+     * @param default_value_len The length of the default_value buffer.
+     *     Note: Ensure to include the trailing NULL in this length
+     *     parameter
      * @param retries The number of times to retry (optional)
      * @returns 0 on success. If the result is > 0 the result code is
      *     one of the helium_status_ error codes. If the result is < 0
@@ -416,6 +423,8 @@ class Config
      * @param config_type The configuration type to check for
      * @param[out] value The destination buffer to copy the result into
      * @param value_len The size of the given destination buffer
+     * @param default_value The default value to use if not found
+     * @param default_value_len The length of the default_value buffer.
      * @param retries The number of times to retry (optional)
      * @returns 0 on success. If the result is > 0 the result code is
      *     one of the helium_status_ error codes. If the result is < 0
