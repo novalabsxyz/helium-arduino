@@ -585,8 +585,9 @@ helium_channel_poll_data(struct helium_ctx * ctx,
     if (helium_poll_OK_NO_DATA == status && retries > 0)
     {
         helium_channel_send(ctx, 0, NULL, 0, NULL);
+        status = helium_channel_poll_token(ctx, token, data, len, used, retries);
     }
-    return helium_channel_poll_token(ctx, token, data, len, used, retries);
+    return status;
 }
 
 #define CHANNEL_CREATE 0x01
