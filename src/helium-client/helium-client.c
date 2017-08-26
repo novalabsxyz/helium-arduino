@@ -325,7 +325,7 @@ helium_connect(struct helium_ctx * ctx,
         return helium_connect_ERR_COMMUNICATION;
     }
 
-    while (retries-- >= 0)
+    while (retries-- > 0)
     {
         enum helium_connected_status connected_status = helium_connected(ctx);
         switch (connected_status)
@@ -516,7 +516,7 @@ helium_channel_poll_token(struct helium_ctx * ctx,
                           size_t *            used,
                           uint32_t            retries)
 {
-    while (retries-- > 0)
+    do
     {
         uint8_t * frame     = ctx->buf;
         size_t    poll_used = 2;
@@ -550,7 +550,7 @@ helium_channel_poll_token(struct helium_ctx * ctx,
         case helium_poll_ERR_COMMUNICATION:
             return helium_poll_ERR_COMMUNICATION;
         }
-    }
+    } while (retries-- > 0);
 
     return helium_poll_OK_NO_DATA;
 }
