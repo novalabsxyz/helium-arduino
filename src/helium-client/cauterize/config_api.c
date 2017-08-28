@@ -6,7 +6,7 @@
 #define FSET(FS,IX) ((FS) & (1ull << (IX)))
 
 /* schema hash */
-hashtype_t const SCHEMA_HASH_config_api = { 0x82,0x0C,0x22,0xDB,0xDF,0xAF,0x52,0x86,0x09,0xA7,0xD4,0xB4,0x33,0x23,0xB4,0x80,0x7A,0xD8,0xFB,0x8F };
+hashtype_t const SCHEMA_HASH_config_api = { 0xF7,0x64,0x57,0xA7,0x90,0xE5,0x48,0xFA,0x37,0x03,0xD4,0x97,0x0A,0xFC,0x7B,0x04,0x1F,0xAB,0xE7,0xC8 };
 
 /* type encoders */
 R encode_string(EI * const _c_iter, struct string const * const _c_obj) {
@@ -57,6 +57,23 @@ R encode_key(EI * const _c_iter, struct key const * const _c_obj) {
   return caut_status_ok;
 }
 
+R encode_cmd_config_set_res(EI * const _c_iter, struct cmd_config_set_res const * const _c_obj) {
+  caut_tag8_t _temp_tag = (caut_tag8_t)_c_obj->_tag;
+
+  if (_temp_tag >= UNION_NUM_FIELDS_cmd_config_set_res) {
+    return caut_status_invalid_tag;
+  }
+
+  STATUS_CHECK(encode_tag8(_c_iter, &_temp_tag));
+
+  switch(_c_obj->_tag) {
+  case cmd_config_set_res_tag_err: STATUS_CHECK(encode_u8(_c_iter, &_c_obj->err)); break;
+  case cmd_config_set_res_tag_res: /* No data for field res with index 1. */ break;
+  }
+
+  return caut_status_ok;
+}
+
 R encode_assoc(EI * const _c_iter, struct assoc const * const _c_obj) {
   STATUS_CHECK(encode_key(_c_iter, &_c_obj->k));
   STATUS_CHECK(encode_value(_c_iter, &_c_obj->v));
@@ -92,6 +109,23 @@ R encode_arr_assoc(EI * const _c_iter, struct arr_assoc const * const _c_obj) {
   return caut_status_ok;
 }
 
+R encode_cmd_config_get_res(EI * const _c_iter, struct cmd_config_get_res const * const _c_obj) {
+  caut_tag8_t _temp_tag = (caut_tag8_t)_c_obj->_tag;
+
+  if (_temp_tag >= UNION_NUM_FIELDS_cmd_config_get_res) {
+    return caut_status_invalid_tag;
+  }
+
+  STATUS_CHECK(encode_tag8(_c_iter, &_temp_tag));
+
+  switch(_c_obj->_tag) {
+  case cmd_config_get_res_tag_err: STATUS_CHECK(encode_u8(_c_iter, &_c_obj->err)); break;
+  case cmd_config_get_res_tag_res: STATUS_CHECK(encode_arr_assoc(_c_iter, &_c_obj->res)); break;
+  }
+
+  return caut_status_ok;
+}
+
 R encode_cmd_config_get(EI * const _c_iter, struct cmd_config_get const * const _c_obj) {
   caut_tag8_t _temp_tag = (caut_tag8_t)_c_obj->_tag;
 
@@ -103,7 +137,7 @@ R encode_cmd_config_get(EI * const _c_iter, struct cmd_config_get const * const 
 
   switch(_c_obj->_tag) {
   case cmd_config_get_tag_req: STATUS_CHECK(encode_arr_key(_c_iter, &_c_obj->req)); break;
-  case cmd_config_get_tag_res: STATUS_CHECK(encode_arr_assoc(_c_iter, &_c_obj->res)); break;
+  case cmd_config_get_tag_res: STATUS_CHECK(encode_cmd_config_get_res(_c_iter, &_c_obj->res)); break;
   }
 
   return caut_status_ok;
@@ -120,7 +154,7 @@ R encode_cmd_config_set(EI * const _c_iter, struct cmd_config_set const * const 
 
   switch(_c_obj->_tag) {
   case cmd_config_set_tag_req: STATUS_CHECK(encode_arr_assoc(_c_iter, &_c_obj->req)); break;
-  case cmd_config_set_tag_res: STATUS_CHECK(encode_u8(_c_iter, &_c_obj->res)); break;
+  case cmd_config_set_tag_res: STATUS_CHECK(encode_cmd_config_set_res(_c_iter, &_c_obj->res)); break;
   }
 
   return caut_status_ok;
@@ -196,6 +230,24 @@ R decode_key(DI * const _c_iter, struct key * const _c_obj) {
   return caut_status_ok;
 }
 
+R decode_cmd_config_set_res(DI * const _c_iter, struct cmd_config_set_res * const _c_obj) {
+  caut_tag8_t _temp_tag;
+  STATUS_CHECK(decode_tag8(_c_iter, &_temp_tag));
+
+  if (_temp_tag >= UNION_NUM_FIELDS_cmd_config_set_res) {
+    return caut_status_invalid_tag;
+  } else {
+    _c_obj->_tag = (enum cmd_config_set_res_tag)_temp_tag;
+  }
+
+  switch(_c_obj->_tag) {
+  case cmd_config_set_res_tag_err: STATUS_CHECK(decode_u8(_c_iter, &_c_obj->err)); break;
+  case cmd_config_set_res_tag_res: /* No data for field i"res" with index 1. */ break;
+  }
+
+  return caut_status_ok;
+}
+
 R decode_assoc(DI * const _c_iter, struct assoc * const _c_obj) {
   STATUS_CHECK(decode_key(_c_iter, &_c_obj->k));
   STATUS_CHECK(decode_value(_c_iter, &_c_obj->v));
@@ -231,6 +283,24 @@ R decode_arr_assoc(DI * const _c_iter, struct arr_assoc * const _c_obj) {
   return caut_status_ok;
 }
 
+R decode_cmd_config_get_res(DI * const _c_iter, struct cmd_config_get_res * const _c_obj) {
+  caut_tag8_t _temp_tag;
+  STATUS_CHECK(decode_tag8(_c_iter, &_temp_tag));
+
+  if (_temp_tag >= UNION_NUM_FIELDS_cmd_config_get_res) {
+    return caut_status_invalid_tag;
+  } else {
+    _c_obj->_tag = (enum cmd_config_get_res_tag)_temp_tag;
+  }
+
+  switch(_c_obj->_tag) {
+  case cmd_config_get_res_tag_err: STATUS_CHECK(decode_u8(_c_iter, &_c_obj->err)); break;
+  case cmd_config_get_res_tag_res: STATUS_CHECK(decode_arr_assoc(_c_iter, &_c_obj->res)); break;
+  }
+
+  return caut_status_ok;
+}
+
 R decode_cmd_config_get(DI * const _c_iter, struct cmd_config_get * const _c_obj) {
   caut_tag8_t _temp_tag;
   STATUS_CHECK(decode_tag8(_c_iter, &_temp_tag));
@@ -243,7 +313,7 @@ R decode_cmd_config_get(DI * const _c_iter, struct cmd_config_get * const _c_obj
 
   switch(_c_obj->_tag) {
   case cmd_config_get_tag_req: STATUS_CHECK(decode_arr_key(_c_iter, &_c_obj->req)); break;
-  case cmd_config_get_tag_res: STATUS_CHECK(decode_arr_assoc(_c_iter, &_c_obj->res)); break;
+  case cmd_config_get_tag_res: STATUS_CHECK(decode_cmd_config_get_res(_c_iter, &_c_obj->res)); break;
   }
 
   return caut_status_ok;
@@ -261,7 +331,7 @@ R decode_cmd_config_set(DI * const _c_iter, struct cmd_config_set * const _c_obj
 
   switch(_c_obj->_tag) {
   case cmd_config_set_tag_req: STATUS_CHECK(decode_arr_assoc(_c_iter, &_c_obj->req)); break;
-  case cmd_config_set_tag_res: STATUS_CHECK(decode_u8(_c_iter, &_c_obj->res)); break;
+  case cmd_config_set_tag_res: STATUS_CHECK(decode_cmd_config_set_res(_c_iter, &_c_obj->res)); break;
   }
 
   return caut_status_ok;
@@ -302,6 +372,11 @@ void init_key(struct key * _c_obj) {
   _c_obj->_length = 0;
 }
 
+void init_cmd_config_set_res(struct cmd_config_set_res * _c_obj) {
+  _c_obj->_tag = (caut_tag8_t) cmd_config_set_res_tag_err;
+  init_u8(&_c_obj->err);
+}
+
 void init_assoc(struct assoc * _c_obj) {
   init_key(&_c_obj->k);
   init_value(&_c_obj->v);
@@ -313,6 +388,11 @@ void init_arr_key(struct arr_key * _c_obj) {
 
 void init_arr_assoc(struct arr_assoc * _c_obj) {
   _c_obj->_length = 0;
+}
+
+void init_cmd_config_get_res(struct cmd_config_get_res * _c_obj) {
+  _c_obj->_tag = (caut_tag8_t) cmd_config_get_res_tag_err;
+  init_u8(&_c_obj->err);
 }
 
 void init_cmd_config_get(struct cmd_config_get * _c_obj) {
@@ -383,6 +463,25 @@ enum caut_ord compare_key(struct key const * const _c_a, struct key const * cons
   return CAUT_ORDER(_c_a->_length, _c_b->_length);
 }
 
+enum caut_ord compare_cmd_config_set_res(struct cmd_config_set_res const * const _c_a, struct cmd_config_set_res const * const _c_b) {
+  enum caut_ord _c_o;
+
+  if (caut_ord_eq != (_c_o = CAUT_ORDER(_c_a->_tag, _c_b->_tag))) {
+    return _c_o;
+  }
+
+  switch(_c_a->_tag) {
+  case cmd_config_set_res_tag_err:
+    _c_o = compare_u8(&_c_a->err, &_c_b->err);
+    break;
+  case cmd_config_set_res_tag_res:
+    _c_o = caut_ord_eq; /* No comparison for empty field res */
+    break;
+  }
+
+  return _c_o;
+}
+
 enum caut_ord compare_assoc(struct assoc const * const _c_a, struct assoc const * const _c_b) {
   enum caut_ord _c_o;
 
@@ -415,6 +514,25 @@ enum caut_ord compare_arr_assoc(struct arr_assoc const * const _c_a, struct arr_
   return CAUT_ORDER(_c_a->_length, _c_b->_length);
 }
 
+enum caut_ord compare_cmd_config_get_res(struct cmd_config_get_res const * const _c_a, struct cmd_config_get_res const * const _c_b) {
+  enum caut_ord _c_o;
+
+  if (caut_ord_eq != (_c_o = CAUT_ORDER(_c_a->_tag, _c_b->_tag))) {
+    return _c_o;
+  }
+
+  switch(_c_a->_tag) {
+  case cmd_config_get_res_tag_err:
+    _c_o = compare_u8(&_c_a->err, &_c_b->err);
+    break;
+  case cmd_config_get_res_tag_res:
+    _c_o = compare_arr_assoc(&_c_a->res, &_c_b->res);
+    break;
+  }
+
+  return _c_o;
+}
+
 enum caut_ord compare_cmd_config_get(struct cmd_config_get const * const _c_a, struct cmd_config_get const * const _c_b) {
   enum caut_ord _c_o;
 
@@ -427,7 +545,7 @@ enum caut_ord compare_cmd_config_get(struct cmd_config_get const * const _c_a, s
     _c_o = compare_arr_key(&_c_a->req, &_c_b->req);
     break;
   case cmd_config_get_tag_res:
-    _c_o = compare_arr_assoc(&_c_a->res, &_c_b->res);
+    _c_o = compare_cmd_config_get_res(&_c_a->res, &_c_b->res);
     break;
   }
 
@@ -446,7 +564,7 @@ enum caut_ord compare_cmd_config_set(struct cmd_config_set const * const _c_a, s
     _c_o = compare_arr_assoc(&_c_a->req, &_c_b->req);
     break;
   case cmd_config_set_tag_res:
-    _c_o = compare_u8(&_c_a->res, &_c_b->res);
+    _c_o = compare_cmd_config_set_res(&_c_a->res, &_c_b->res);
     break;
   }
 

@@ -234,6 +234,7 @@ Config::_get(const char *            config_key,
 {
     uint16_t token;
     int      status = get(config_key, &token);
+    int8_t   result = 0;
     if (helium_status_OK == status)
     {
         status = poll_get_result(token,
@@ -242,7 +243,13 @@ Config::_get(const char *            config_key,
                                  value,
                                  value_len,
                                  default_value,
-                                 default_value_len);
+                                 default_value_len,
+                                 &result,
+                                 retries);
+    }
+    if (helium_status_OK == status && result != 0)
+    {
+        status = helium_status_ERR_COMMUNICATION;
     }
     return status;
 }
@@ -331,6 +338,7 @@ Config::poll_get_result(uint16_t           token,
                         size_t             value_len,
                         void *             default_value,
                         size_t             default_value_len,
+                        int8_t *           result,
                         uint32_t           retries)
 {
     struct _poll_get_context handler_ctx = {
@@ -346,8 +354,14 @@ Config::poll_get_result(uint16_t           token,
                                                        token,
                                                        _poll_get_result_handler,
                                                        &handler_ctx,
+                                                       result,
                                                        retries);
-    return status != helium_status_OK ? status : handler_ctx.status;
+    if (helium_status_OK == status)
+    {
+        status = handler_ctx.status;
+    }
+
+    return status;
 }
 
 int
@@ -365,9 +379,7 @@ Config::set(const char *       config_key,
 }
 
 int
-Config::poll_set_result(uint16_t token,
-                        int8_t * result,
-                        uint32_t retries)
+Config::poll_set_result(uint16_t token, int8_t * result, uint32_t retries)
 {
     return helium_channel_config_set_poll_result(&_channel->helium->_ctx,
                                                  token,

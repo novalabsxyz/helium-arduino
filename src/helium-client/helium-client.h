@@ -149,6 +149,7 @@ helium_channel_config_get_poll_result(struct helium_ctx *           ctx,
                                       uint16_t                      token,
                                       helium_channel_config_handler handler,
                                       void *                        handler_ctx,
+                                      int8_t *                      result,
                                       uint32_t                      retries);
 
 

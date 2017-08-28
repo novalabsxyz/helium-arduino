@@ -569,6 +569,27 @@ helium_channel_poll_result(struct helium_ctx * ctx,
                                      retries);
 }
 
+int
+_helium_channel_poll_data(struct helium_ctx * ctx,
+                          uint8_t             cmd,
+                          uint8_t             channel_id,
+                          void *              data,
+                          size_t              len,
+                          size_t *            used,
+                          uint32_t            retries)
+{
+    uint16_t                token = _mk_token(cmd, channel_id);
+    enum helium_poll_status status =
+        helium_channel_poll_token(ctx, token, data, len, used, 0);
+    if (helium_poll_OK_NO_DATA == status && retries > 0)
+    {
+        helium_channel_send(ctx, 0, NULL, 0, NULL);
+        status = helium_channel_poll_token(ctx, token, data, len, used, retries);
+    }
+    return status;
+}
+
+
 #define CHANNEL_DATA 0x05
 
 int
@@ -579,15 +600,8 @@ helium_channel_poll_data(struct helium_ctx * ctx,
                          size_t *            used,
                          uint32_t            retries)
 {
-    uint16_t                token = _mk_token(CHANNEL_DATA, channel_id);
-    enum helium_poll_status status =
-        helium_channel_poll_token(ctx, token, data, len, used, 0);
-    if (helium_poll_OK_NO_DATA == status && retries > 0)
-    {
-        helium_channel_send(ctx, 0, NULL, 0, NULL);
-        status = helium_channel_poll_token(ctx, token, data, len, used, retries);
-    }
-    return status;
+    return _helium_channel_poll_data(
+        ctx, CHANNEL_DATA, channel_id, data, len, used, retries);
 }
 
 #define CHANNEL_CREATE 0x01
@@ -631,16 +645,14 @@ helium_channel_create(struct helium_ctx * ctx,
     return helium_channel_create_ERR_COMMUNICATION;
 }
 
-
-#define CHANNEL_SEND 0x03
-#define CHANNEL_SEND_RESULT 0x04
-
-int
-helium_channel_send(struct helium_ctx * ctx,
-                    uint8_t             channel_id,
-                    void const *        data,
-                    size_t              len,
-                    uint16_t *          token)
+static int
+_helium_channel_send(struct helium_ctx * ctx,
+                     uint8_t             cmd,
+                     uint8_t             resp,
+                     uint8_t             channel_id,
+                     void const *        data,
+                     size_t              len,
+                     uint16_t *          token)
 {
     uint8_t * frame       = ctx->buf;
     uint8_t   channel_ref = ctx->channel_ref++;
@@ -649,7 +661,7 @@ helium_channel_send(struct helium_ctx * ctx,
         len = HELIUM_MAX_DATA_SIZE;
     }
 
-    *frame++ = CHANNEL_SEND;
+    *frame++ = cmd;
     *frame++ = channel_ref;
     *frame++ = channel_id;
     memcpy(frame, data, len);
@@ -661,7 +673,7 @@ helium_channel_send(struct helium_ctx * ctx,
     case helium_send_OK:
         if (token)
         {
-            *token = _mk_token(CHANNEL_SEND_RESULT, channel_ref);
+            *token = _mk_token(resp, channel_ref);
         }
         return helium_channel_send_OK;
     case helium_send_ERR_NOT_CONNECTED:
@@ -673,6 +685,20 @@ helium_channel_send(struct helium_ctx * ctx,
     }
 
     return helium_channel_send_ERR_COMMUNICATION;
+}
+
+#define CHANNEL_SEND 0x03
+#define CHANNEL_SEND_RESULT 0x04
+
+int
+helium_channel_send(struct helium_ctx * ctx,
+                    uint8_t             channel_id,
+                    void const *        data,
+                    size_t              len,
+                    uint16_t *          token)
+{
+    return _helium_channel_send(
+        ctx, CHANNEL_SEND, CHANNEL_SEND_RESULT, channel_id, data, len, token);
 }
 
 
@@ -764,12 +790,8 @@ _encode_config_value(struct value *          dest,
 }
 
 
-static __inline uint8_t
-_mk_channel_config_id(uint8_t channel_ref)
-{
-    return channel_ref | 1 << 7;
-}
-
+#define CHANNEL_CONFIG 0x06
+#define CHANNEL_CONFIG_RESULT 0x07
 
 int
 helium_channel_config_get(struct helium_ctx * ctx,
@@ -777,8 +799,6 @@ helium_channel_config_get(struct helium_ctx * ctx,
                           const char *        config_key,
                           uint16_t *          token)
 {
-    channel_id = _mk_channel_config_id(channel_id);
-
     struct cmd_config cmd;
     cmd._tag     = cmd_config_tag_get;
     cmd.get._tag = cmd_config_get_tag_req;
@@ -795,7 +815,13 @@ helium_channel_config_get(struct helium_ctx * ctx,
         return helium_status_ERR_CODING;
     }
 
-    return helium_channel_send(ctx, channel_id, data, ei.position, token);
+    return _helium_channel_send(ctx,
+                                CHANNEL_CONFIG,
+                                CHANNEL_CONFIG_RESULT,
+                                channel_id,
+                                data,
+                                ei.position,
+                                token);
 }
 
 
@@ -825,6 +851,8 @@ _channel_config_poll_cmd(struct helium_ctx * ctx,
     return helium_status_OK;
 }
 
+#define CHANNEL_CONFIG_DATA 0x08
+
 static __inline int
 _channel_config_poll_data(struct helium_ctx * ctx,
                           uint8_t             channel_id,
@@ -833,10 +861,9 @@ _channel_config_poll_data(struct helium_ctx * ctx,
                           struct cmd_config * cmd,
                           uint32_t            retries)
 {
-    channel_id = _mk_channel_config_id(channel_id);
     size_t used;
-    int    status =
-        helium_channel_poll_data(ctx, channel_id, data, len, &used, retries);
+    int    status = _helium_channel_poll_data(
+        ctx, CHANNEL_CONFIG_DATA, channel_id, data, len, &used, retries);
     if (status != helium_status_OK)
     {
         return status;
@@ -859,6 +886,7 @@ helium_channel_config_get_poll_result(struct helium_ctx *           ctx,
                                       uint16_t                      token,
                                       helium_channel_config_handler handler,
                                       void *                        handler_ctx,
+                                      int8_t *                      result,
                                       uint32_t                      retries)
 {
     struct cmd_config cmd;
@@ -875,7 +903,29 @@ helium_channel_config_get_poll_result(struct helium_ctx *           ctx,
         return helium_status_ERR_CODING;
     }
 
-    struct arr_assoc * arr_assoc = &cmd.get.res;
+    int8_t err;
+    switch (cmd.get.res._tag)
+    {
+    case cmd_config_get_res_tag_res:
+        err = 0;
+        break;
+    case cmd_config_get_res_tag_err:
+        err = cmd.get.res.err;
+        break;
+    }
+
+    if (result)
+    {
+        *result = err;
+    }
+
+    if (err != 0)
+    {
+        return status;
+    }
+
+    // We have a valid encoded result
+    struct arr_assoc * arr_assoc = &cmd.get.res.res;
 
     for (int i = 0; i < arr_assoc->_length; i++)
     {
@@ -892,7 +942,8 @@ helium_channel_config_get_poll_result(struct helium_ctx *           ctx,
             break;
         }
     }
-    return helium_status_OK;
+
+    return status;
 }
 
 
@@ -905,8 +956,6 @@ helium_channel_config_set(struct helium_ctx *     ctx,
                           void *                  value,
                           uint16_t *              token)
 {
-    channel_id = _mk_channel_config_id(channel_id);
-
     struct cmd_config cmd;
     cmd._tag            = cmd_config_tag_set;
     cmd.set._tag        = cmd_config_set_tag_req;
@@ -923,7 +972,13 @@ helium_channel_config_set(struct helium_ctx *     ctx,
         return helium_status_ERR_CODING;
     }
 
-    return helium_channel_send(ctx, channel_id, data, ei.position, token);
+    return _helium_channel_send(ctx,
+                                CHANNEL_CONFIG,
+                                CHANNEL_CONFIG_RESULT,
+                                channel_id,
+                                data,
+                                ei.position,
+                                token);
 }
 
 
@@ -947,12 +1002,22 @@ helium_channel_config_set_poll_result(struct helium_ctx * ctx,
         return helium_status_ERR_CODING;
     }
 
-    if (result)
+    int8_t err;
+    switch (cmd.set.res._tag)
     {
-        *result = cmd.set.res;
+    case cmd_config_set_res_tag_res:
+        err = 0;
+        break;
+    case cmd_config_set_res_tag_err:
+        err = cmd.set.res.err;
     }
 
-    return helium_status_OK;
+    if (result)
+    {
+        *result = err;
+    }
+
+    return status;
 }
 
 

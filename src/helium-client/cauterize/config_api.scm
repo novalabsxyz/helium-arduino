@@ -1,6 +1,6 @@
 ;; -*- cauterize -*-
 (name "config_api")
-(version "1.0.0")
+(version "2.0.0")
 
 (type key vector u8 20)
 (type string vector u8 32)
@@ -26,12 +26,24 @@
        (field set cmd_config_set)
        (empty invalidate ) ))
 
+(type cmd_config_get_res union
+      (fields
+        (field err u8)
+        (field res arr_assoc) ))
+
 (type cmd_config_get union
       (fields
        (field req arr_key)
-       (field res arr_assoc) ))
+       (field res cmd_config_get_res) ))
+
+(type cmd_config_set_res union
+      (fields
+        (field err u8)
+        (empty res)
+      ))
 
 (type cmd_config_set union
       (fields
        (field req arr_assoc)
-       (field res u8)))
+       (field res cmd_config_set_res)))
+

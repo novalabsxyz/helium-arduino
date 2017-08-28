@@ -245,10 +245,10 @@ class Channel
                   size_t * used,
                   uint32_t retries = HELIUM_POLL_RETRIES_5S);
 
-    Helium *helium;
+    Helium * helium;
 
   private:
-    int8_t   _channel_id;
+    int8_t _channel_id;
 
     friend class Config;
 };
@@ -427,6 +427,8 @@ class Config
      * @param default_value The default value to use if not found
      * @param default_value_len The length of the default_value buffer.
      * @param retries The number of times to retry (optional)
+     * @param[out] result The channel response code.
+     *     0 for no errors, non-0 otherwise
      * @returns 0 on success. If the result is > 0 the result code is
      *     one of the helium_status_ error codes. If the result is < 0
      *     it is one of the config_poll_get_status error codes
@@ -438,6 +440,7 @@ class Config
                         size_t                  value_len,
                         void *                  default_value,
                         size_t                  default_value_len,
+                        int8_t *                result,
                         uint32_t retries = HELIUM_POLL_RETRIES_5S);
 
     /** Set a float configuration value

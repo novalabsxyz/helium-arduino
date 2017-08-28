@@ -1,9 +1,9 @@
 (name "config_api")
-(version "1.0.0")
-(fingerprint 820c22dbdfaf528609a7d4b43323b4807ad8fb8f)
-(size 1 553)
-(depth 7)
-(typelength 2)
+(version "2.0.0")
+(fingerprint f76457a790e548fa3703d4970afc7b041fabe7c8)
+(size 1 554)
+(depth 8)
+(typelength 1)
 (lengthtag t2)
 (type 
   string
@@ -37,6 +37,14 @@
   20
   t1)
 (type 
+  cmd_config_set_res
+  union
+  (fingerprint b9a5d26741b87f989fca5380dcad34f14e3497da)
+  (size 1 2)
+  (depth 2)
+  t1
+  (fields (field err 0 u8) (empty res 1)))
+(type 
   assoc
   record
   (fingerprint 5497422e7abc9db96ea1091ddd87623e5c2af7e3)
@@ -62,26 +70,34 @@
   10
   t1)
 (type 
-  cmd_config_get
+  cmd_config_get_res
   union
-  (fingerprint 1db523aaee3bcac2030a13ba87b37bd22f5bdafd)
+  (fingerprint ad8e46ec07590c045d6a1218a28c31dde0075585)
   (size 2 552)
   (depth 6)
   t1
-  (fields (field req 0 arr_key) (field res 1 arr_assoc)))
+  (fields (field err 0 u8) (field res 1 arr_assoc)))
+(type 
+  cmd_config_get
+  union
+  (fingerprint 453b9e9aa33fa74f19e673ff7372bd77f330e68a)
+  (size 2 553)
+  (depth 7)
+  t1
+  (fields (field req 0 arr_key) (field res 1 cmd_config_get_res)))
 (type 
   cmd_config_set
   union
-  (fingerprint 54c50d707bc57dbb703b1a676f4db1c0f65c00e4)
+  (fingerprint 63473a511e7f6f5fc5d9d5514e93bd8b53eaedd8)
   (size 2 552)
   (depth 6)
   t1
-  (fields (field req 0 arr_assoc) (field res 1 u8)))
+  (fields (field req 0 arr_assoc) (field res 1 cmd_config_set_res)))
 (type 
   cmd_config
   union
-  (fingerprint d8b08141cbf2823d829045a36119d7536def6ab7)
-  (size 1 553)
-  (depth 7)
+  (fingerprint 2b4d33bec64974fe099516c536736229c5cfa5a3)
+  (size 1 554)
+  (depth 8)
   t1
   (fields (field get 0 cmd_config_get) (field set 1 cmd_config_set) (empty invalidate 2)))

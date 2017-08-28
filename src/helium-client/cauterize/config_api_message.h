@@ -4,7 +4,7 @@
 #include "config_api.h"
 
 /* message interface */
-#define TYPE_TAG_WIDTH_config_api (2)
+#define TYPE_TAG_WIDTH_config_api (1)
 #define LENGTH_WIDTH_config_api (2)
 
 #define MESSAGE_OVERHEAD_config_api (TYPE_TAG_WIDTH_config_api + LENGTH_WIDTH_config_api)
@@ -27,9 +27,11 @@ struct message_config_api {
     struct string msg_string;
     struct value msg_value;
     struct key msg_key;
+    struct cmd_config_set_res msg_cmd_config_set_res;
     struct assoc msg_assoc;
     struct arr_key msg_arr_key;
     struct arr_assoc msg_arr_assoc;
+    struct cmd_config_get_res msg_cmd_config_get_res;
     struct cmd_config_get msg_cmd_config_get;
     struct cmd_config_set msg_cmd_config_set;
     struct cmd_config msg_cmd_config;
