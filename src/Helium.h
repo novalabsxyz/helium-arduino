@@ -245,6 +245,7 @@ class Channel
                   size_t * used,
                   uint32_t retries = HELIUM_POLL_RETRIES_5S);
 
+    /** The Helium Atom this channel uses to communicate. */
     Helium * helium;
 
   private:
