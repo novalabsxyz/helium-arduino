@@ -7,6 +7,7 @@
 #define HELIUM_CLIENT_H
 
 #include "cauterize/atom_api.h"
+#include "cauterize/config_api.h"
 #include "helium-client-error.h"
 #include <stdbool.h>
 #include <stdint.h>
@@ -93,6 +94,14 @@ helium_channel_poll_data(struct helium_ctx * ctx,
                          uint32_t            retries);
 
 int
+helium_channel_poll_token(struct helium_ctx * ctx,
+                          uint16_t            token,
+                          void *              data,
+                          size_t              len,
+                          size_t *            used,
+                          uint32_t            retries);
+
+int
 helium_channel_poll_result(struct helium_ctx * ctx,
                            uint16_t            token,
                            int8_t *            result,
@@ -111,6 +120,58 @@ helium_channel_send(struct helium_ctx * ctx,
                     size_t              len,
                     uint16_t *          token);
 
+//
+// Channel Configuration
+//
+
+enum helium_config_type
+{
+    helium_config_i32,
+    helium_config_f32,
+    helium_config_str,
+    helium_config_bool,
+    helium_config_null,
+};
+
+int
+helium_channel_config_get(struct helium_ctx * ctx,
+                          uint8_t             channel_id,
+                          const char *        config_key,
+                          uint16_t *          token);
+
+typedef bool (*helium_channel_config_handler)(void *       handler_ctx,
+                                              const char * key,
+                                              enum helium_config_type value_type,
+                                              void *                  value);
+
+int
+helium_channel_config_get_poll_result(struct helium_ctx *           ctx,
+                                      uint16_t                      token,
+                                      helium_channel_config_handler handler,
+                                      void *                        handler_ctx,
+                                      int8_t *                      result,
+                                      uint32_t                      retries);
+
+
+int
+helium_channel_config_set(struct helium_ctx *     ctx,
+                          uint8_t                 channel_id,
+                          const char *            config_key,
+                          enum helium_config_type value_type,
+                          void *                  value,
+                          uint16_t *              token);
+
+int
+helium_channel_config_set_poll_result(struct helium_ctx * ctx,
+                                      uint16_t            token,
+                                      int8_t *            result,
+                                      uint32_t            retries);
+
+int
+helium_channel_config_poll_invalidate(struct helium_ctx * ctx,
+                                      uint8_t             channel_id,
+                                      bool *              result,
+                                      uint32_t            retries);
 
 //
 // Externally required functions

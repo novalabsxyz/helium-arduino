@@ -6,36 +6,20 @@
 #include "Arduino.h"
 #include "Board.h"
 #include "Helium.h"
+#include "HeliumUtil.h"
+
+// NOTE: Please ensure you've created a channel with the above
+// CHANNEL_NAME as it's name.
+#define CHANNEL_NAME "Helium MQTT"
 
 Helium  helium(&atom_serial);
 Channel channel(&helium);
 
 void
-report_status(int status, int result = 0)
-{
-    if (helium_status_OK == status)
-    {
-        if (result == 0)
-        {
-            Serial.println("Succeeded");
-        }
-        else
-        {
-            Serial.print("Failed - ");
-            Serial.println(result);
-        }
-    }
-    else
-    {
-        Serial.println("Failed");
-    }
-}
-
-void
 setup()
 {
     Serial.begin(9600);
-    Serial.println("Starting");
+    DBG_PRINTLN(F("Starting"));
 
     // Begin communication with the Helium Atom
     // The baud rate differs per supported board
@@ -43,21 +27,12 @@ setup()
     helium.begin(HELIUM_BAUD_RATE);
 
     // Connect the Atom to the Helium Network
-    Serial.print("Connecting - ");
-    int status = helium.connect();
-    // Print status
-    report_status(status);
+    helium_connect(&helium);
 
     // Begin communicating with the channel. This should only need to
-    // be done once.
-    //
-    // NOTE: Please ensure you've created a channel called "Helium
-    // MQTT" called in the Helium Dashboard.
-    int8_t result;
-    Serial.print("Creating Channel - ");
-    status = channel.begin("Helium MQTT", &result);
-    // Print status and result
-    report_status(status, result);
+    // be done once. The HeliumUtil functions add simple retry logic
+    // to re-create a channel if it disconnects.
+    channel_create(&channel, CHANNEL_NAME);
 }
 
 void
@@ -65,13 +40,9 @@ loop()
 {
     const char * data = "Hello Helium!";
 
-    // Send some data to the configured channel
-    int8_t result;
-    Serial.print("Sending - ");
-    int    status = channel.send(data, strlen(data), &result);
-    // Print status and result
-    report_status(status, result);
+    // Send data to channel
+    channel_send(&channel, CHANNEL_NAME, data, strlen(data));
 
-    // Wait a while till the next time
+    // Wait about 5 seconds
     delay(5000);
 }

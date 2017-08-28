@@ -4,3 +4,10 @@ output.map
 docs
 gh-pages
 TAGS
+GTAGS
+GRTAGS
+GPATH
+*.o
+*.a
+*.lib
+compile_commands.json
