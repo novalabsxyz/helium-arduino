@@ -5,9 +5,7 @@ CFLAGS = -g ${WARN} -std=c11 -I. -I./cauterize -D_BSD_SOURCE -D_DEFAULT_SOURCE
 
 OBJS = helium-client.o \
 	cauterize/atom_api.o \
-	cauterize/atom_api_message.o \
 	cauterize/config_api.o \
-	cauterize/config_api_message.o \
 	cauterize/cauterize.o
 
 all: lib${PROJECT}.a
