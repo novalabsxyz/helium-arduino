@@ -12,17 +12,18 @@ report_status(int status, int result)
     {
         if (result == 0)
         {
-            DBG_PRINTLN(F("Succeeded"));
+            DBG_PRINTLN(F("Success"));
         }
         else
         {
-            DBG_PRINT(F("Failed - "));
+            DBG_PRINT(F("FailR - "));
             DBG_PRINTLN(result);
         }
     }
     else
     {
-        DBG_PRINTLN("Failed");
+        DBG_PRINT(F("FailS - "));
+        DBG_PRINTLN(status);
     }
     return status;
 }
@@ -33,7 +34,7 @@ helium_connect(Helium * helium)
 {
     while (!helium->connected())
     {
-        DBG_PRINT(F("Connecting - "));
+        DBG_PRINT(F("Connect - "));
         int status = helium->connect();
         if (report_status(status) != helium_status_OK)
         {
@@ -51,7 +52,7 @@ channel_create(Channel * channel, const char * channel_name)
     {
         // Ensure we're connected
         helium_connect(channel->helium);
-        DBG_PRINT(F("Creating Channel - "));
+        DBG_PRINT(F("Channel - "));
         status = channel->begin(channel_name, &result);
         // Print status and result
         if (report_status(status, result) != helium_status_OK)
@@ -73,7 +74,7 @@ channel_send(Channel *    channel,
     do
     {
         // Try to send
-        DBG_PRINT(F("Sending - "));
+        DBG_PRINT(F("Send - "));
         status = channel->send(data, len, &result);
         report_status(status, result);
         // Create the channel if any service errors are returned
