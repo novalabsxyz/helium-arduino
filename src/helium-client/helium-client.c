@@ -716,7 +716,7 @@ helium_channel_send(struct helium_channel * channel,
 
 
 #define CHANNEL_PING 0x09
-#define CHANNEL_PONG 0x10
+#define CHANNEL_PONG 0x0A
 
 int
 helium_channel_ping(struct helium_channel * channel, uint16_t * token)
