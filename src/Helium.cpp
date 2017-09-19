@@ -375,9 +375,9 @@ Config::_set(const char *            config_key,
 }
 
 bool
-Config::is_stale()
+Config::is_stale(uint32_t retries)
 {
     bool result = false;
-    helium_config_poll_invalidate(&_ctx, &result, 0);
+    helium_config_poll_invalidate(&_ctx, &result, retries);
     return result;
 }

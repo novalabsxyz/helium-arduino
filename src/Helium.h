@@ -555,10 +555,13 @@ class Config
      * When this returns true you should assume that any configuration
      * values you have previously retrieved are no longer valid.
      *
+     * @param retries The number of times to retry (optional). Defaults
+     *     to 0 since the common case is that staleness will be signaled
+     *     after a normal channel send has been performed.
      * @returns true if previous configuration values are stale, false
      *     if not
      */
-    bool is_stale();
+    bool is_stale(uint32_t retries = 0);
 
 
   private:
