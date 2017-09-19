@@ -129,6 +129,10 @@ helium_channel_send(struct helium_channel * channel,
                     size_t                  len,
                     uint16_t *              token);
 
+int
+helium_channel_ping(struct helium_channel * channel, uint16_t * token);
+
+
 //
 // Configuration
 //

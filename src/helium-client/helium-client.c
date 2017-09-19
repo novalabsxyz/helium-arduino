@@ -616,7 +616,7 @@ helium_channel_init(struct helium_channel * channel,
                     struct helium_ctx *     helium,
                     uint8_t                 channel_id)
 {
-    channel->helium = helium;
+    channel->helium     = helium;
     channel->channel_id = channel_id;
 }
 
@@ -634,9 +634,7 @@ _helium_channel_poll_data(struct helium_channel * channel,
         helium_poll_token(channel->helium, token, data, len, used, 0);
     if (helium_poll_OK_NO_DATA == status && retries > 0)
     {
-        struct helium_channel poll_channel;
-        helium_channel_init(&poll_channel, channel->helium, 0);
-        helium_channel_send(&poll_channel, NULL, 0, NULL);
+        helium_channel_ping(channel, NULL);
         status =
             helium_poll_token(channel->helium, token, data, len, used, retries);
     }
@@ -717,13 +715,23 @@ helium_channel_send(struct helium_channel * channel,
 }
 
 
+#define CHANNEL_PING 0x09
+#define CHANNEL_PONG 0x10
+
+int
+helium_channel_ping(struct helium_channel * channel, uint16_t * token)
+{
+    return _helium_channel_send(channel, CHANNEL_PING, 0, NULL, 0, token);
+}
+
+
+
 //
 // Configuration
 //
 
 void
-helium_config_init(struct helium_config *  config,
-                   struct helium_channel * channel)
+helium_config_init(struct helium_config * config, struct helium_channel * channel)
 {
     config->channel = channel;
 }
