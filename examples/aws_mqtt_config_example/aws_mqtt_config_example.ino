@@ -74,12 +74,11 @@ loop()
     JsonObject & root = jsonBuffer.createObject();
     root[F("Interval")] = send_interval;
     
-    int8_t result;
     char buffer[HELIUM_MAX_DATA_SIZE];
     size_t used = root.printTo(buffer, HELIUM_MAX_DATA_SIZE);    
     // Send data to channel
 
-    int    status = channel.send(buffer, used, &result);
+    channel_send(&channel, CHANNEL_NAME, buffer, used);
         // Print status and result
     update_config(config.is_stale());
     // Wait a while till the next time
