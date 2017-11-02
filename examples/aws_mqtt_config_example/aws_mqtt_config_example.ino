@@ -10,7 +10,7 @@
 #include "ArduinoJson.h"
 
 // NOTE: This sample uses the "AWS IoT" channel which is available
-// by in the Helium Dashboard. To use another channel, change the channel
+// on the Helium Dashboard. To use another channel, change the channel
 // name to the target channel and adjust the Config variable name to match
 // the cloud service's variable name
 //
@@ -21,7 +21,7 @@
 // the new interval rate (in milliseconds)
 //
 #define CHANNEL_NAME "YOUR CHANNEL NAME HERE"
-#define CONFIG_INTERVAL_KEY "channel.interval"
+#define CONFIG_INTERVAL_KEY "channel.interval_ms"
 
 Helium  helium(&atom_serial);
 Channel channel(&helium);
