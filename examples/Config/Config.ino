@@ -7,6 +7,7 @@
 #include "Board.h"
 #include "Helium.h"
 #include "HeliumUtil.h"
+#include "ArduinoJson.h"
 
 // NOTE: This sample uses the "Helium MQTT" channel which is available
 // by default in the Helium Dashboard.
@@ -71,14 +72,17 @@ setup()
 void
 loop()
 {
-    const char * data = "Hello Helium!";
+    StaticJsonBuffer<JSON_OBJECT_SIZE(2) + 35> jsonBuffer;
+    JsonObject & root = jsonBuffer.createObject();
+    root[F("interval")] = send_interval;
+    
+    char buffer[HELIUM_MAX_DATA_SIZE];
+    size_t used = root.printTo(buffer, HELIUM_MAX_DATA_SIZE);    
+    // Send data to channel
 
-    // Send some data to the configured channel
-    channel_send(&channel, CHANNEL_NAME, data, strlen(data));
-
-    // Check and update the send interval
+    channel_send(&channel, CHANNEL_NAME, buffer, used);
+        // Print status and result
     update_config(config.is_stale());
-
-    // Wait till the next time
+    // Wait a while till the next time
     delay(send_interval);
 }
