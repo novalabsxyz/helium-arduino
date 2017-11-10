@@ -23,11 +23,13 @@
 // console as it prints out a "Fetching Config" message when the
 // configuration change is noticed.
 //
-// Install the ArduinoJson library before running through Sketch->Include Libraries->Manage Libraries
-// search for ArduinoJson and click Install. Then restart the Arduino IDE
+// Install the ArduinoJson library before running through Sketch->Include 
+// Libraries->Manage Libraries search for ArduinoJson and click Install. 
+// Then restart the Arduino IDE.
 //
-// For device/thing shadows interface on Azure/AWS, the channel configuration variable format 
-// is "channel.<variable name>" as shown below
+// For device/thing/config shadows interface on Azure/AWS/Google 
+// or any channel that supports configuration, the channel configuration 
+// variable format is "channel.<variable name>" as shown below
 
 #define CHANNEL_NAME "Helium MQTT"
 // #define CONFIG_INTERVAL_KEY "channel.interval_ms" 
