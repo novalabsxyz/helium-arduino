@@ -22,7 +22,15 @@
 // You should also see the updated configuration arrive in the serial
 // console as it prints out a "Fetching Config" message when the
 // configuration change is noticed.
+//
+// Install the ArduinoJson library before running through Sketch->Include Libraries->Manage Libraries
+// search for ArduinoJson and click Install. Then restart the Arduino IDE
+//
+// For device/thing shadows interface on Azure/AWS, the channel configuration variable format 
+// is "channel.<variable name>" as shown below
+
 #define CHANNEL_NAME "Helium MQTT"
+// #define CONFIG_INTERVAL_KEY "channel.interval_ms" 
 #define CONFIG_INTERVAL_KEY "config.interval_ms"
 
 Helium  helium(&atom_serial);
