@@ -7,6 +7,7 @@
 #include "Board.h"
 #include "Helium.h"
 #include "HeliumUtil.h"
+#include "ArduinoJson.h"
 
 // NOTE: This sample uses the "Helium MQTT" channel which is available
 // by default in the Helium Dashboard.
@@ -21,7 +22,17 @@
 // You should also see the updated configuration arrive in the serial
 // console as it prints out a "Fetching Config" message when the
 // configuration change is noticed.
+//
+// Install the ArduinoJson library before running through Sketch->Include 
+// Libraries->Manage Libraries search for ArduinoJson and click Install. 
+// Then restart the Arduino IDE.
+//
+// For device/thing/config shadows interface on Azure/AWS/Google 
+// or any channel that supports configuration, the channel configuration 
+// variable format is "channel.<variable name>" as shown below
+
 #define CHANNEL_NAME "Helium MQTT"
+// #define CONFIG_INTERVAL_KEY "channel.interval_ms" 
 #define CONFIG_INTERVAL_KEY "config.interval_ms"
 
 Helium  helium(&atom_serial);
@@ -71,14 +82,17 @@ setup()
 void
 loop()
 {
-    const char * data = "Hello Helium!";
+    StaticJsonBuffer<JSON_OBJECT_SIZE(2) + 35> jsonBuffer;
+    JsonObject & root = jsonBuffer.createObject();
+    root[F("interval")] = send_interval;
+    
+    char buffer[HELIUM_MAX_DATA_SIZE];
+    size_t used = root.printTo(buffer, HELIUM_MAX_DATA_SIZE);    
+    // Send data to channel
 
-    // Send some data to the configured channel
-    channel_send(&channel, CHANNEL_NAME, data, strlen(data));
-
-    // Check and update the send interval
+    channel_send(&channel, CHANNEL_NAME, buffer, used);
+        // Print status and result
     update_config(config.is_stale());
-
-    // Wait till the next time
+    // Wait a while till the next time
     delay(send_interval);
 }
