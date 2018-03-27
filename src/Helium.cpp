@@ -52,17 +52,20 @@ Helium::Helium(HardwareSerial * serial)
     helium_init(&_ctx, (void *)serial);
 }
 
-#if defined(ARDUINO_AVR_UNO)
+#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560)
 Helium::Helium(SoftwareSerial * serial)
 {
     helium_init(&_ctx, (void *)serial);
 }
+
+
+
 #endif
 
 int
 Helium::begin(enum helium_baud baud)
 {
-#if defined(ARDUINO_AVR_UNO)
+#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560)
     SoftwareSerial * serial = (SoftwareSerial *)_ctx.param;
 #else
     HardwareSerial * serial = (HardwareSerial *)_ctx.param;
