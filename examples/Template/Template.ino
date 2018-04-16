@@ -111,7 +111,7 @@ loop()
 */
           root[F("1")]    = reading_1;
           root[F("2")] = reading_2;
-          state = States::forth;
+          state = States::fourth;
           break;
         case fourth:
 /*
