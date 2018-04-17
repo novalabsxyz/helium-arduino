@@ -18,17 +18,21 @@
 #include "Helium.h"
 #include "HeliumUtil.h"
 #include "ArduinoJson.h"
-
+/* Please see https://arduinojson.org to determine the byte overhead for each json
+   structured message. This will change based on the kind of sensor data you are 
+   sending. As it is set now, this is two objects in a 100 byte size structure.
+   This will probably be way more than enough for two sensor readings per send.
+   Please check with their documentation on sizing the object!
+   */
 
 #define CHANNEL_NAME "Helium MQTT"
-#define CONFIG_VAR "channel.config_var"
+#define CONFIG_VAR "channel.interval_ms"
 
 Helium  helium(&atom_serial);
 Channel channel(&helium);
 Config  config(&channel);
 
-int32_t config_var; //CONFIGURATION VARIABLE
-int state = 0;
+int32_t interval_ms; //CONFIGURATION VARIABLE
 bool cycle = false; 
 int32_t reading_1;
 int32_t reading_2;
@@ -42,19 +46,21 @@ enum States
     fifth
 };
 
+States state;
+
 void
 update_config(bool stale)
 {
     if (stale)
     {
         DBG_PRINT(F("Fetching Config - "));
-        int status = config.get(CONFIG_VAR, &config_var, 0);
+        int status = config.get(CONFIG_VAR, &interval_ms, 0);
         report_status(status);
 
         if (status == helium_status_OK)
         {
             DBG_PRINT(F("Updating Config - "));
-            status = config.set(CONFIG_VAR, config_var);
+            status = config.set(CONFIG_VAR, interval_ms);
             report_status(status);
         }
     }
@@ -155,5 +161,5 @@ loop()
     update_config(config.is_stale());
     cycle = false;
     // Wait till the next time
-    delay(2000);
+    delay(interval_ms);
 }
