@@ -145,12 +145,7 @@ loop()
           state = States::first;
           cycle = true;
           break;
-*/
-        default:
-          cycle = true;
-          state = States::first;
-          Serial.println("def");
-          break;
+*/       
       }
       char   buffer[HELIUM_MAX_DATA_SIZE];
       size_t used = root.printTo(buffer, HELIUM_MAX_DATA_SIZE);
