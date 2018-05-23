@@ -12,6 +12,11 @@
 SoftwareSerial atom_serial(8, 9);
 #define HELIUM_BAUD_RATE helium_baud_b9600
 
+#elif defined(ARDUINO_AVR_MEGA2560)
+#include "SoftwareSerial.h"
+SoftwareSerial atom_serial(10,11);
+#define HELIUM_BAUD_RATE helium_baud_b9600 
+
 #elif defined(ARDUINO_SAM_ZERO)
 // Arduino M0 Pro
 #define atom_serial Serial5
@@ -46,6 +51,12 @@ extern "C"{
         return len;
     }
 }
+
+#elif defined(ARDUINO_AVR_PRO)
+//ProMini/Micro with Serial pins (8,9)
+#include "SoftwareSerial.h"
+SoftwareSerial atom_serial(8,9);
+
 #endif
 
 #ifndef HELIUM_BAUD_RATE

@@ -9,7 +9,7 @@
 #include "Arduino.h"
 #include "helium-client/helium-client.h"
 
-#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560)
+#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_PRO)
 #include <SoftwareSerial.h>
 #endif
 
@@ -34,7 +34,7 @@ class Helium
      */
     Helium(HardwareSerial * serial);
 
-#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560)
+#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_PRO)
     /** Create a Helium instance on a software serial port
      *
      * @note SoftwareSerial is only exposed for the Arduino UNO.
