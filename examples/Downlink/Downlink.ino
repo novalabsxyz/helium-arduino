@@ -6,6 +6,7 @@
 #include "Arduino.h"
 #include "Board.h"
 #include "Helium.h"
+#include "HeliumUtil.h"
 
 // NOTE: Please ensure you've created a channel called "Helium
 // MQTT" called in the Helium Dashboard.
@@ -13,29 +14,6 @@
 
 Helium  helium(&atom_serial);
 Channel channel(&helium);
-
-
-int
-report_status(int status, int result = 0)
-{
-    if (helium_status_OK == status)
-    {
-        if (result == 0)
-        {
-            Serial.println("Succeeded");
-        }
-        else
-        {
-            Serial.print("Failed - ");
-            Serial.println(result);
-        }
-    }
-    else
-    {
-        Serial.println("Failed");
-    }
-    return status;
-}
 
 
 void

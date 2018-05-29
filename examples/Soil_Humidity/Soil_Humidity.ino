@@ -15,6 +15,7 @@
 #include "Board.h"
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include <HeliumUtil.h>
 #include <Helium.h>
 #include <Wire.h>
 
@@ -28,27 +29,6 @@
 Helium  helium(&atom_serial);
 Channel channel(&helium);
 int     channel_counter;
-
-void
-report_status(int status, int result = 0)
-{
-    if (helium_status_OK == status)
-    {
-        if (result == 0)
-        {
-            Serial.println(F("Succeeded"));
-        }
-        else
-        {
-            Serial.print(F("Failed - "));
-            Serial.println(result);
-        }
-    }
-    else
-    {
-        Serial.println(F("Failed"));
-    }
-}
 
 void
 connect()
