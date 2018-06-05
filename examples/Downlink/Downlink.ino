@@ -31,25 +31,6 @@ connect()
 }
 
 void
-channel_create(const char * channel_name)
-{
-    int8_t result;
-    int    status;
-    do
-    {
-        // Ensure we're connected
-        connect();
-        Serial.print("Creating Channel - ");
-        status = channel.begin(channel_name, &result);
-        // Print status and result
-        if (report_status(status, result) != helium_status_OK)
-        {
-            delay(1000);
-        }
-    } while (helium_status_OK != status || result != 0);
-}
-
-void
 channel_poll(void * data, size_t len, size_t * used)
 {
     int status;
@@ -76,7 +57,7 @@ setup()
     // Connect the Atom to the Helium Network
     connect();
     // and ensure the channel is created
-    channel_create(CHANNEL_NAME);
+    channel_create(&channel, CHANNEL_NAME);
 }
 
 
