@@ -10,25 +10,11 @@
 
 // NOTE: Please ensure you've created a channel called "Helium
 // MQTT" called in the Helium Dashboard.
-#define CHANNEL_NAME "AWS IoT"
+#define CHANNEL_NAME "Helium MQTT"
 
 Helium  helium(&atom_serial);
 Channel channel(&helium);
 
-
-void
-connect()
-{
-    while (!helium.connected())
-    {
-        Serial.print("Connecting - ");
-        int status = helium.connect();
-        if (report_status(status) != helium_status_OK)
-        {
-            delay(1000);
-        }
-    }
-}
 
 void
 channel_poll(void * data, size_t len, size_t * used)
@@ -55,7 +41,7 @@ setup()
     helium.begin(HELIUM_BAUD_RATE);
 
     // Connect the Atom to the Helium Network
-    connect();
+    helium_connect(&helium);
     // and ensure the channel is created
     channel_create(&channel, CHANNEL_NAME);
 }
