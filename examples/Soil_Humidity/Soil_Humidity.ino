@@ -31,73 +31,18 @@ Channel channel(&helium);
 int     channel_counter;
 
 void
-connect()
-{
-    while (!helium.connected())
-    {
-        Serial.print(F("Connecting - "));
-        int status = helium.connect();
-        report_status(status);
-        if (helium_status_OK != status)
-        {
-            delay(1000);
-        }
-    }
-}
-
-void
-channel_create(const char * channel_name)
-{
-    int8_t result;
-    int    status;
-    do
-    {
-        // Ensure we're connected
-        connect();
-        Serial.print(F("Creating Channel - "));
-        status = channel.begin(channel_name, &result);
-        // Print status and result
-        report_status(status, result);
-        if (helium_status_OK != status)
-        {
-            delay(1000);
-        }
-    } while (helium_status_OK != status || result != 0);
-}
-
-void
-channel_send(const char * channel_name, void const * data, size_t len)
-{
-    int    status;
-    int8_t result;
-
-    do
-    {
-        // Try to send
-        Serial.print(F("Sending - "));
-        status = channel.send(data, len, &result);
-        report_status(status, result);
-        // Create the channel if any service errors are returned
-        if (status == helium_status_OK && result != 0)
-        {
-            channel_create(channel_name);
-        }
-        else if (status != helium_status_OK)
-        {
-            delay(1000);
-        }
-    } while (helium_status_OK != status || result != 0);
-}
-
-
-void
 setup()
 {
     Serial.begin(9600);
     Serial.println(F("Starting"));
 
-    helium.begin(HELIUM_BAUD_RATE);
-    channel_create(CHANNEL_NAME);
+    helium.begin(HELIUM_BAUD_RATE); 
+    // Connect the Atom to the Helium Network
+    helium_connect(&helium);
+    // and do a channel connect
+    channel_create(&channel, CHANNEL_NAME);
+
+    // Get the initial interval
     channel_counter = 0;
 }
 
@@ -120,16 +65,13 @@ loop()
 
     if (--channel_counter <= 0)
     {
-        StaticJsonBuffer<JSON_OBJECT_SIZE(2) + 100> jsonBuffer;
-        JsonObject & root = jsonBuffer.createObject();
+        DynamicJsonDocument doc(100);
+        doc["value"] = reading;
+        doc["percent"] = percent;
+        char buffer[HELIUM_MAX_DATA_SIZE];
+        size_t used = serializeJson(doc, buffer);
 
-        root[F("value")]    = reading;
-        root[F("percent")] = percent;
-
-        char   buffer[HELIUM_MAX_DATA_SIZE];
-        size_t used = root.printTo(buffer, HELIUM_MAX_DATA_SIZE);
-
-        channel_send(CHANNEL_NAME, buffer, used);
+        channel_send(&channel, CHANNEL_NAME, buffer, used);
 
         channel_counter = CHANNEL_SEND_CYCLE;
     }

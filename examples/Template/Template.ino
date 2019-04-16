@@ -90,8 +90,7 @@ setup()
 void
 loop()
 {
-    StaticJsonBuffer<JSON_OBJECT_SIZE(2) + 100> jsonBuffer;
-    JsonObject & root = jsonBuffer.createObject();
+    DynamicJsonDocument doc(100);
     while(cycle = false){
       switch(state) {
         case first:
@@ -99,40 +98,45 @@ loop()
           put sensing code for fist two sensors here and save the returned values to reading_1
           and reading_2
 */
-          root[F("1")]    = reading_1;
-          root[F("2")] = reading_2;
+          doc["1"] = reading_1;
+          doc["2"] = reading_2;
+
           state = States::second;
           break;
         case second:
 /*
           next sensor code
 */
-          root[F("1")]    = reading_1;
-          root[F("2")] = reading_2;
+          doc["1"] = reading_1;
+          doc["2"] = reading_2;
+
           state = States::third;
           break;
         case third:
 /*
           next sensor code
 */
-          root[F("1")]    = reading_1;
-          root[F("2")] = reading_2;
+          doc["1"] = reading_1;
+          doc["2"] = reading_2;
+
           state = States::fourth;
           break;
         case fourth:
 /*
           next sensor code
 */
-          root[F("1")]    = reading_1;
-          root[F("2")] = reading_2;
+          doc["1"] = reading_1;
+          doc["2"] = reading_2;
+
           state = States::fifth;
           break;
         case fifth:
  /*
           next sensor code
  */         
-          root[F("1")]    = reading_1;
-          root[F("2")] = reading_2;
+          doc["1"] = reading_1;
+          doc["2"] = reading_2;
+
           state = States::first;
           cycle = true;
           break;
@@ -140,15 +144,14 @@ loop()
           you can add cases incrementally to add more sensors
           i.e.
         case sixth: 
-          root[F("1")] = reading_1;
-          root[F("2")] = reading_2;
           state = States::first;
           cycle = true;
           break;
 */       
       }
-      char   buffer[HELIUM_MAX_DATA_SIZE];
-      size_t used = root.printTo(buffer, HELIUM_MAX_DATA_SIZE);
+      char buffer[HELIUM_MAX_DATA_SIZE];
+      size_t used = serializeJson(doc, buffer);
+
       channel_send(&channel, CHANNEL_NAME, buffer, used);
       delay(1000);
     }
