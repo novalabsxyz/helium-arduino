@@ -12,6 +12,11 @@
 SoftwareSerial atom_serial(8, 9);
 #define HELIUM_BAUD_RATE helium_baud_b9600
 
+#elif defined(AVR_UNO_WIFI_R2)
+#include "SoftwareSerial.h"
+SoftwareSerial atom_serial(8, 9);
+#define HELIUM_BAUD_RATE helium_baud_b9600
+
 #elif defined(ARDUINO_AVR_MEGA2560)
 #include "SoftwareSerial.h"
 SoftwareSerial atom_serial(10,11);
