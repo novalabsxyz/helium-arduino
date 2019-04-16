@@ -82,7 +82,7 @@ setup()
 void
 loop()
 {
-    DynamicJsonDocument doc(35);
+    StaticJsonDocument<35> doc;
     doc["interval"] = send_interval;
     char buffer[HELIUM_MAX_DATA_SIZE];
     size_t used = serializeJson(doc, buffer);

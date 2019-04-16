@@ -90,7 +90,7 @@ setup()
 void
 loop()
 {
-    DynamicJsonDocument doc(100);
+    StaticJsonDocument<100> doc;
     while(cycle = false){
       switch(state) {
         case first:

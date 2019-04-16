@@ -65,7 +65,7 @@ loop()
 
     if (--channel_counter <= 0)
     {
-        DynamicJsonDocument doc(100);
+        StaticJsonDocument<100> doc;
         doc["value"] = reading;
         doc["percent"] = percent;
         char buffer[HELIUM_MAX_DATA_SIZE];
