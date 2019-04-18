@@ -27,7 +27,7 @@ Arduino M0 Pro    | 0              | 1               |                          
 Arduino Zero      | 0              | 1               |                                                 |
 Arduino Due       | 9              | 8               | Wire up RX3 (15) to pin 8 on board, TX3 to pin9 |
 Arduino Mega      | 10             | 11              |                                                 |
-
+Arduino WiFi Rev2 | 9              | 8               |                                                 |
 ## Example Setup ##
 
 The example sketches can be found in the Arduino IDE under _File >
