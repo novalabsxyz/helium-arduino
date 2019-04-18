@@ -52,7 +52,7 @@ Helium::Helium(HardwareSerial * serial)
     helium_init(&_ctx, (void *)serial);
 }
 
-#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_PRO) || defined(CORE_TEENSY) || defined(AVR_UNO_WIFI_R2)
+#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_PRO) || defined(CORE_TEENSY) || defined(ARDUINO_AVR_UNO_WIFI_REV2)
 Helium::Helium(SoftwareSerial * serial)
 {
     helium_init(&_ctx, (void *)serial);
@@ -65,7 +65,7 @@ Helium::Helium(SoftwareSerial * serial)
 int
 Helium::begin(enum helium_baud baud)
 {
-#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_PRO) || defined(CORE_TEENSY) || defined(AVR_UNO_WIFI_R2)
+#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_PRO) || defined(CORE_TEENSY) || defined(ARDUINO_AVR_UNO_WIFI_REV2)
     SoftwareSerial * serial = (SoftwareSerial *)_ctx.param;
 #else
     HardwareSerial * serial = (HardwareSerial *)_ctx.param;
